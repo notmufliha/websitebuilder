@@ -8,6 +8,10 @@ const {
   CREATE_PAGE_REQUEST,
   CREATE_PAGE_ERROR,
   CREATE_PAGE_SUCCESS,
+
+  DELETE_PAGE_REQUEST,
+  DELETE_PAGE_SUCCESS,
+  DELETE_PAGE_ERROR,
 } = TYPES;
 
 const initialState = {
@@ -42,6 +46,23 @@ const pageReducer = (state = initialState, action) => {
       };
     case CREATE_PAGE_SUCCESS:
       return { ...state, createPageError: "", createPageLoading: false,  pages: [...state.pages, action.data]};
+    
+      case DELETE_PAGE_REQUEST:
+        return { ...state, deletePageError: "", deletePageLoading: true };
+      case DELETE_PAGE_ERROR:
+        return {
+          ...state,
+          deletePageError: action.error,
+          deletePageLoading: false,
+        };
+      case DELETE_PAGE_SUCCESS:
+        return {
+          ...state,
+          deletePageError: "",
+          deletePageLoading: false,
+          // Filter out the deleted page from the pages array
+          pages: state.pages.filter((page) => page._id !== action.pageId),
+        };
 
     default:
       return state;
