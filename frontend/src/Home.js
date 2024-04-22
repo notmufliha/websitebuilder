@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { createPage } from "./redux/actions/pageAction";
+import { deletePage } from "./redux/actions/pageAction";
 import "./styles/Home.css";
 
 const Home = () => {
   const [name, setName] = useState("");
+  const [idToDelete, setIdToDelete] = useState("");
   const [isValid, setIsValid] = useState(true);
   const dispatch = useDispatch();
 
@@ -19,7 +21,17 @@ const Home = () => {
     }
     createPage(name)(dispatch);
   };
-
+  const handleDelete = async (pageId) => {
+    if (!pageId) return; // Check if there's an ID to delete
+    try {
+      await deletePage(pageId)(dispatch);
+      setIdToDelete(""); // Clear the ID after deletion
+    } catch (error) {
+      console.error("Error deleting page:", error);
+      // Handle error if necessary
+    }
+  };
+  
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -85,6 +97,13 @@ const Home = () => {
                     <td>{page.slug}</td>
                     <td>
                       <Link to={`/editor/${page._id}`} className="btn btn-info btn-sm">Edit</Link>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => handleDelete(page._id)} // Set the ID for deletion
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 )) : (
