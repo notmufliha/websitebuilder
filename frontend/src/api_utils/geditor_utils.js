@@ -460,14 +460,11 @@ export const panels = {
           className: "fa fa-eye",
           command: "preview",
         },
-<<<<<<< HEAD
         {
           id: "exportAllPages",
           className: "fa fa-download",
           command: "exportAllPages",
         },
-=======
->>>>>>> upstream/master
       ],
     },
     {
@@ -514,7 +511,7 @@ export const addEditorCommand = (editor) => {
   editor.Commands.add("set-device-mobile", {
     run: (editor) => editor.setDevice("Mobile"),
   });
-  
+
 
   // Save Button
   editor.Commands.add("saveDb", {
@@ -544,9 +541,9 @@ export const addEditorCommand = (editor) => {
 
   editor.Commands.add("export", {
     run: (editor) => {
-    editor.runCommand("gjs-export-zip")
-    console.log(editor)
-    //  alert(`Select page to export:\n${dropdownHTML}`);
+      editor.runCommand("gjs-export-zip")
+      console.log(editor)
+      //  alert(`Select page to export:\n${dropdownHTML}`);
     }
   });
 
@@ -554,19 +551,19 @@ export const addEditorCommand = (editor) => {
   //   run: (editor) => {
   //     // Get the list of pages
   //     const allPages = editor.Pages.getAll();
-      
+
   //     // Collect the HTML content of all pages
   //     const htmlAll = allPages.map(page => page.getMainComponent().toHTML());
-      
+
   //     // Create a single string containing HTML of all pages
   //     const allPagesHTML = htmlAll.join('\n\n');
-  
+
   //     // Now you can export allPagesHTML as desired
   //     console.log(allPagesHTML);
   //     // You can add code here to handle the export of all pages HTML
   //   }
   // });
-  
+
 
   editor.Commands.add("new-tool-cmd", {
     run: (editor) => console.log("Checking New Toolbar"),
