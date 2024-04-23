@@ -4,7 +4,7 @@ import $ from "jquery";
 import grapesjsBlockBootstrap from "grapesjs-blocks-bootstrap4";
 import grapesjsPluginExport from "grapesjs-plugin-export";
 import grapesjsStyleBg from "grapesjs-style-bg";
-
+import { API_HOST } from ".";
 import {
   addEditorCommand,
   deviceManager,
@@ -47,7 +47,139 @@ const geditorConfig = (assets, pageId) => {
     selectorManager: selectorManager,
     panels: panels,
     deviceManager: deviceManager,
-    assetManager: { assets: assets, upload: false },
+    // assetManager: {
+    //   upload: `${API_HOST}uploads/`, // Endpoint for uploading files
+    //   uploadName: 'myImage', // Name of the POST parameter to pass files
+    //   multiUpload: false, // Allow uploading multiple files at once
+    //   add: function (asset, opts) {
+    //     // Function to add an asset after it's uploaded
+    //     console.log('Asset added', asset);
+    //   },
+    //   uploadFile: function (e) {
+    //     var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    //     var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0]; // Only take the first file
+    //     // Create a FormData object
+    //     var formData = new FormData();
+    //     formData.append('myImage', file);
+
+    //     // Send the request
+    //     $.ajax({
+    //       url: this.upload,
+    //       type: 'POST',
+    //       data: formData,
+    //       contentType: false,
+    //       // crossDomain: true,
+    //       dataType: 'json',
+    //       mimeType: "multipart/form-data",
+    //       processData: false,
+    //       success: function (result) {
+    //         console.log('Result: ', result);
+    //         // Assuming result contains the path to the image, e.g., result.imageUrl
+    //         // Add the uploaded image to the assets in the GrapesJS Asset Manager
+    //         editor.AssetManager.addAsset({
+    //           src: result.imageUrl,
+    //           name: result.file.fileName
+    //         });
+    //       },
+    //       error: function (xhr, status, err) {
+    //         console.error('Upload error: ', err);
+    //       },
+    //     });
+    //   },
+
+    //   uploadText: 'Drop files here or click to upload',
+    // },
+    assetManager: {
+      upload: `${API_HOST}uploads/`, // Endpoint for uploading files
+      uploadName: 'myImage', // Name of the POST parameter to pass files
+      multiUpload: false, 
+      uploadFile: function (e) {
+        var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+        if (files.length > 0) {
+          var file = files[0]; // Only take the first file
+          var formData = new FormData();
+          formData.append('myImage', file);
+    
+          $.ajax({
+            url: this.upload,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            dataType: 'json',
+            mimeType: "multipart/form-data",
+            processData: false,
+            success: function (result) {
+              editor.AssetManager.addAsset({
+                src: result.imageUrl,
+                name: result.file.fileName
+              });
+            },
+            error: function (xhr, status, err) {
+              console.error('Upload error: ', status, err);
+            },
+          });
+        } else {
+          console.log('No files to upload');
+        }
+      },
+    
+      uploadText: 'Drop files here or click to upload',// Allow uploading multiple files at once
+      // add: function (asset, opts) {
+      //   // Function to add an asset after it's uploaded
+      //   console.log('Asset added', asset);
+      // },
+      // uploadFile: function (e) {
+      //   console.log('uploadFile triggered'); // Check if function is triggered
+
+      //   // Check if event is triggered with correct data
+      //   if (e.dataTransfer) {
+      //     console.log('Files dropped', e.dataTransfer.files);
+      //   } else if (e.target) {
+      //     console.log('Files selected', e.target.files);
+      //   }
+
+      //   var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+      //   // Check if files are found
+      //   console.log('Files array', files);
+
+      //   if (files.length > 0) {
+      //     var file = files[0]; // Only take the first file
+      //     console.log('Uploading file:', file.name); // Log the file name being uploaded
+
+      //     // Create a FormData object
+      //     var formData = new FormData();
+      //     formData.append('myImage', file);
+
+      //     // Send the request
+      //     $.ajax({
+      //       url: this.upload,
+      //       type: 'POST',
+      //       data: formData,
+      //       contentType: false,
+      //       dataType: 'json',
+      //       mimeType: "multipart/form-data",
+      //       processData: false,
+      //       success: function (result) {
+      //         console.log('Upload successful, server result:', result);
+      //         // Assuming result contains the path to the image, e.g., result.imageUrl
+      //         // Add the uploaded image to the assets in the GrapesJS Asset Manager
+      //         editor.AssetManager.addAsset({
+      //           src: result.imageUrl,
+      //           name: result.file.fileName
+      //         });
+      //       },
+      //       error: function (xhr, status, err) {
+      //         console.error('Upload error: ', status, err);
+      //       },
+      //     });
+      //   } else {
+      //     console.log('No files to upload');
+      //   }
+      // },
+
+      // uploadText: 'Drop files here or click to upload',
+    },
+
     storageManager: storageSetting(pageId),
     canvas: {
       styles: styles,

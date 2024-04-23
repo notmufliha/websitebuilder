@@ -402,12 +402,15 @@ export const styleManager = {
 export const layerManager = {
   appendTo: "#layers-container",
 };
+
 export const traitManager = {
   appendTo: "#trait-container",
 };
+
 export const selectorManager = {
   appendTo: "#styles-container",
 };
+
 export const panels = {
   defaults: [
     {
@@ -488,6 +491,7 @@ export const panels = {
     },
   ],
 };
+
 export const deviceManager = {
   devices: [
     {
@@ -510,6 +514,7 @@ export const addEditorCommand = (editor) => {
   editor.Commands.add("set-device-mobile", {
     run: (editor) => editor.setDevice("Mobile"),
   });
+  
 
   // Save Button
   editor.Commands.add("saveDb", {
@@ -593,6 +598,7 @@ export const scripts = [
   "https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js",
   "https://cdn.jsdelivr.net/npm/chart.js",
 ];
+
 export const styles = [
   "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css",
   "https://unpkg.com/swiper@7/swiper-bundle.min.css",

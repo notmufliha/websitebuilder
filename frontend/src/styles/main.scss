@@ -84,22 +84,8 @@ html {
   display: contents;
 }
 
-#block {
-  height: 100%;
-
-  #blocks {
-    height: 100%;
-
-    .gjs-blocks-c {
-      align-items: center;
-      justify-content: center;
-    }
-
-    .gjs-block {
-      justify-content: center;
-    }
-  }
-}
+#block {}
+//   
 
 /* Theming */
 .gjs-one-bg {
@@ -203,7 +189,7 @@ html {
 }
 
 .grp-wrapper {
-  background-image: url("data:image/png:base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==");
+  background-image: url("https://i.stack.imgur.com/Bhpd8.jpg");
 }
 
 .grp-preview {
