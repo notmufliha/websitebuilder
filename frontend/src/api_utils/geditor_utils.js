@@ -457,11 +457,14 @@ export const panels = {
           className: "fa fa-eye",
           command: "preview",
         },
+<<<<<<< HEAD
         {
           id: "exportAllPages",
           className: "fa fa-download",
           command: "exportAllPages",
         },
+=======
+>>>>>>> upstream/master
       ],
     },
     {
