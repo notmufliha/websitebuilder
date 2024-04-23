@@ -24,6 +24,7 @@ export const deletePage = async (pageId) => {
 export const updatePage = async (pageId, pageBody) => {};
 export const pageDetails = async (pageId) => {
   const pages = await Pages.findOne({ _id: pageId });
+  
   return pages;
 };
 export const savePageContent = async (pageId, content) => {
