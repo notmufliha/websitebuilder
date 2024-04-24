@@ -3,9 +3,10 @@ function PageDetail({ page }) {
   const { name } = page;
   return (
     <li className="list-group-item d-flex justify-content-between align-items-center">
-      <Link className="text-decoration-none" to={`/editor/${page._id}`}>
+      <a href={`/editor/${page._id}`} class="text-decoration-none">
         {name}
-      </Link>
+      </a>
+
       <div>
         <button className="btn btn-sm btn-outline-primary">
           <i className="fa fa-pencil"></i>
