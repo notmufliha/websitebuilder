@@ -138,84 +138,6 @@ const Home = () => {
   
     setSelectedPages([]);
   };
-<<<<<<< Updated upstream
-  
- 
-
-
-  // const handleExport = async () => {
-  //   const pageDataPromises = selectedPages.map(async (pageId) => {
-  //     try {
-  //       const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
-  //       const data = await response.json();
-  //       console.log(data)
-
-  //       // Clean the HTML string
-  //       const cleanedHTML = data.content['mycustom-html']
-  //       const cleanedCSS = data.content['mycustom-css']
-  //       const cleanedComponents = JSON.parse(data.content['mycustom-components']);
-  //       const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
-  //       console.log(cleanedComponents)
-  //       console.log(cleanedAssets)
-  //       return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId };
-
-  //     } catch (error) {
-  //       console.error('Error fetching page data:', error);
-  //       return null;
-  //     }
-  //   });
-
-
-  //   // Wait for all page data promises to resolve
-  //   const pageData = await Promise.all(pageDataPromises);
-
-  //   // Create a new ZIP archive 
-  //   const zip = new JSZip();
-  //   const assets = {};
-
-  //   // Add the HTML for each page to the ZIP archive 
-  //   pageData.forEach(({ html, css, components, assets, pageId }) => {
-  //     if (html) {
-  //       const htmlContent = `
-  //           <html lang="en">
-  //           <head>
-  //               <meta charset="utf-8">
-  //               <link rel="stylesheet" href="./css/style.css">
-  //           </head>
-  //           <body>
-  //               ${html}
-  //           </body>
-  //           </html>
-  //       `;
-  //       console.log(htmlContent)
-  //       assets.forEach((asset, index) => {
-  //         const filename = `images/${pageId}_image_${index + 1}.jpg`;
-  //         // Fetch assets and add them to the zip
-  //         // Adjust the path as per your server setup
-  //         fetch(asset.src, { mode: 'no-cors' })
-  //           .then(response => response.blob())
-  //           .then(blob => {
-  //             zip.file(filename, blob);
-  //           })
-  //           .catch(error => console.error('Error fetching asset:', error));
-
-  //       });
-
-  //       zip.file(`page_${pageId}/index.html`, htmlContent);
-  //       zip.file(`page_${pageId}/css/style.css`, css);
-  //     }
-  //   });
-
-  //   // // Generate the ZIP archive 
-  //   zip.generateAsync({ type: 'blob' }).then((content) => {
-  //     saveAs(content, 'pages.zip');
-  //   });
-
-  //   setSelectedPages([]);
-  // };
-
-=======
->>>>>>> Stashed changes
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -314,11 +236,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-<<<<<<< Updated upstream
-
-=======
       <ToastContainer />
->>>>>>> Stashed changes
     </div>
   );
 };
