@@ -461,11 +461,6 @@ export const panels = {
           className: "fa fa-eye",
           command: "preview",
         },
-        {
-          id: "exportAllPages",
-          className: "fa fa-download",
-          command: "exportAllPages",
-        },
       ],
     },
     {
@@ -547,25 +542,6 @@ export const addEditorCommand = (editor) => {
       //  alert(`Select page to export:\n${dropdownHTML}`);
     }
   });
-
-  // editor.Commands.add("exportAllPages", {
-  //   run: (editor) => {
-  //     // Get the list of pages
-  //     const allPages = editor.Pages.getAll();
-
-  //     // Collect the HTML content of all pages
-  //     const htmlAll = allPages.map(page => page.getMainComponent().toHTML());
-
-  //     // Create a single string containing HTML of all pages
-  //     const allPagesHTML = htmlAll.join('\n\n');
-
-  //     // Now you can export allPagesHTML as desired
-  //     console.log(allPagesHTML);
-  //     // You can add code here to handle the export of all pages HTML
-  //   }
-  // });
-
-
   editor.Commands.add("new-tool-cmd", {
     run: (editor) => console.log("Checking New Toolbar"),
   });
