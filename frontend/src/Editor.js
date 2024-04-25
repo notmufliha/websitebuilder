@@ -19,20 +19,38 @@ const Editor = () => {
   useEffect(() => {
     async function getAllAssets() {
       try {
-        const response = await axios.get(`${API_HOST}assets/`);
-        setAssets(response.data);
+        // Updated to use the new endpoint for fetching assets
+        const response = await axios.get(`${API_HOST}uploads`);
+        if (response.data.success) {
+          // Update the editor's Asset Manager with new assets
+          const assets = response.data.assets.map(asset => ({
+            src: asset.url, // Assuming 'url' is the key that contains the asset URL
+            // Add other properties if necessary
+          }));
+          if (editor) {
+            editor.AssetManager.add(assets);
+          }
+        } else {
+          throw new Error(response.data.message);
+        }
       } catch (error) {
-        setAssets(error.message);
+        console.error('Failed to fetch assets:', error);
       }
     }
 
-    getAllAssets();
-  }, []);
+    // Call the function if the editor is initialized
+    if (editor) {
+      getAllAssets();
+    }
+  }, [editor]);
 
   useEffect(() => {
-    const editor = geditorConfig(assets, pageId);
-    setEditor(editor);
+    // Initialize the GrapesJS editor
+    const initEditor = geditorConfig(pageId, assets);
+    setEditor(initEditor);
   }, [pageId, assets]);
+
+
   return (
     <div className="App">
       <div

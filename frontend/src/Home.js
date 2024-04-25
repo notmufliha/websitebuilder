@@ -103,6 +103,7 @@ const Home = () => {
               zip.file(filename, blob);
             })
             .catch(error => console.error('Error fetching asset:', error));
+
         });
 
         zip.file(`page_${pageId}/index.html`, htmlContent);
