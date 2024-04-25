@@ -81,7 +81,7 @@ export default function PageSection({ pages }) {
           </Modal.Footer>
         </Modal>
       </form>
-      <ul className="list-group pages">
+      <ul className="list-group pages" style={{ height: '200px' }}>
         {pages.map((page) => (
           <PageDetail page={page} key={page._id} />
         ))}

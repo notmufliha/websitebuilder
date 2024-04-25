@@ -6,6 +6,10 @@ import { deletePage } from "./redux/actions/pageAction";
 import "./styles/Home.css";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
+
 
 const Home = () => {
   const [name, setName] = useState("");
@@ -21,20 +25,36 @@ const Home = () => {
   const handleSubmit = async () => {
     if (!name) {
       setIsValid(false);
+      toast.error("Please provide a valid name.");
       return;
     }
-    createPage(name)(dispatch);
+    try {
+      await createPage(name)(dispatch);
+      setName('');
+      toast.success("Page created successfully!");
+    } catch (error) {
+      toast.error("Failed to create page.");
+    }
   };
+
+  const confirmDelete = async (pageId) => {
+    if (window.confirm("Are you sure you want to delete this page?")) {
+      handleDelete(pageId);
+    }
+  };
+
   const handleDelete = async (pageId) => {
     if (!pageId) return; // Check if there's an ID to delete
     try {
       await deletePage(pageId)(dispatch);
-      setIdToDelete(""); // Clear the ID after deletion
+      setIdToDelete("");
+      toast.success("Page deleted successfully!");
     } catch (error) {
       console.error("Error deleting page:", error);
-      // Handle error if necessary
+      toast.error("Error deleting page.");
     }
   };
+
   const handlePageCheckboxChange = (pageId) => {
     if (selectedPages.includes(pageId)) {
       setSelectedPages(selectedPages.filter((id) => id !== pageId));
@@ -118,6 +138,7 @@ const Home = () => {
   
     setSelectedPages([]);
   };
+<<<<<<< Updated upstream
   
  
 
@@ -193,6 +214,8 @@ const Home = () => {
   //   setSelectedPages([]);
   // };
 
+=======
+>>>>>>> Stashed changes
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -291,9 +314,88 @@ const Home = () => {
           </div>
         </div>
       </div>
+<<<<<<< Updated upstream
 
+=======
+      <ToastContainer />
+>>>>>>> Stashed changes
     </div>
   );
 };
-
 export default Home;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ // Fetch the HTML and CSS for each selected page from the backend
+  // const pageDataPromises = selectedPages.map(pageId =>
+  //     fetch(`http://localhost:8080/api/pages/${pageId}`)
+  //     .then(response => {
+  //       console.log(response.text())
+  //         if (!response.ok) {
+  //             throw new Error('Network response was not ok');
+  //         }
+  //         return response.text(); // Get the raw text content
+  //     })
+  //     .then(data => ({
+  //         html: data, // Assign HTML directly
+  //         pageId
+  //     }))
+  //     .catch(error => console.error('Error fetching page data:', error))
+  // );
+
+  // var parser = new DOMParser();
+
+  // Parse the text
+  // var doc = parser.parseFromString(html, "text/html");
+
+  // // Wait for all page data to be fetched 
+  // const pageData = await Promise.all(pageDataPromises);
+
+  // Create a new ZIP archive 
+  // const zip = new JSZip();
+
+  // Add the HTML for each page to the ZIP archive 
+  // pageData.forEach(({ html, pageId }) => {
+  //     const htmlContent = `
+  //         <html lang="en">
+  //         <head>
+  //             <meta charset="utf-8">
+  //             <link rel="stylesheet" href="./css/style.css">
+  //         </head>
+  //         <body>
+  //             ${html}
+  //         </body>
+  //         </html>
+  //     `;
+  //     zip.file(`page_${pageId}/index.html`, htmlContent);
+  // });
+
+  // // Generate the ZIP archive 
+  // zip.generateAsync({ type: 'blob' }).then((content) => {
+  //     saveAs(content, 'pages.zip');
+  // });
+
+  // Clear selected pages after export 

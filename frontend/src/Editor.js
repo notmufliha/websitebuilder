@@ -7,8 +7,13 @@ import Sidebar from "./components/Sidebar";
 import TopNav from "./components/TopNav";
 import geditorConfig from "./api_utils/geditor_config";
 import PageSection from "./components/PageSection";
+import { useHistory } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+
 
 const Editor = () => {
+  let history = useHistory();
   const [editor, setEditor] = useState(null);
   const [assets, setAssets] = useState([]);
   const { pageId } = useParams();
@@ -57,14 +62,20 @@ const Editor = () => {
         id="navbar"
         className="sidenav d-flex flex-column overflow-scroll position-fixed"
       >
-        <nav className="navbar navbar-light">
-          <div className="container-fluid">
+        <nav className="navbar navbar-light" style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="container-fluid" style={{ display: 'flex', alignItems: 'center' }}>
+            <button
+              onClick={() => history.push('/')}
+              style={{ fontSize: '24px', border: 'none', background: 'none', padding: 0, cursor: 'pointer' }}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
             <span className="navbar-brand mb-0 h3 logo">darius</span>
           </div>
         </nav>
         <PageSection pages={pages} />
         <Sidebar />
-      </div>
+      </div >
       <div
         className="main-content position-relative w-85 start-15"
         id="main-content"
@@ -72,7 +83,7 @@ const Editor = () => {
         <TopNav />
         <div id="editor"></div>
       </div>
-    </div>
+    </div >
   );
 };
 
