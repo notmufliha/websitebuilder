@@ -20,6 +20,7 @@ import {
 } from "./geditor_utils";
 import tailwindComponent from "../plugins/tailwind";
 import swiperComponent from "../plugins/swiper";
+import gjsnavbar from "../plugins/navbar";
 import chartLibComponent from "../plugins/charts";
 
 const geditorConfig = (assets, pageId) => {
@@ -73,6 +74,7 @@ const geditorConfig = (assets, pageId) => {
     },
     plugins: [
       tailwindComponent,
+      gjsnavbar,
       gjsBlockBasic,
       swiperComponent,
       grapesjsBlockBootstrap,
@@ -82,6 +84,7 @@ const geditorConfig = (assets, pageId) => {
     ],
     pluginsOpts: {
       tailwindComponent: {},
+      gjsnavbar: {},
       gjsBlockBasic: {},
       swiperComponent: {},
       grapesjsBlockBootstrap: {},

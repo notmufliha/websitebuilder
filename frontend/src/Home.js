@@ -16,6 +16,7 @@ const Home = () => {
 
   const { pageStore } = useSelector((state) => state);
   const { pages } = pageStore;
+  console.log(pages)
 
   const handleSubmit = async () => {
     if (!name) {
