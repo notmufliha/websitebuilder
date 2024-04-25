@@ -68,6 +68,13 @@ const Home = () => {
         const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
         const data = await response.json();
   
+        // Check if data or content is null or empty
+        if (!data || !data.content || !data.content['mycustom-html']) {
+          // Notify user if the page data is null or empty
+          toast.error(`Page ${data.name} has no content or does not exist.`);
+          return null;
+        }
+  
         // Clean the HTML string
         const cleanedHTML = data.content['mycustom-html'];
         const cleanedCSS = data.content['mycustom-css'];
@@ -78,12 +85,23 @@ const Home = () => {
   
       } catch (error) {
         console.error('Error fetching page data:', error);
+        // Notify user if there's an error fetching page data
+        toast.error('Error fetching page data. Please try again later.');
         return null;
       }
     });
   
     // Wait for all page data promises to resolve
     const pageData = await Promise.all(pageDataPromises);
+  
+    // Filter out null entries before further processing
+    const validPageData = pageData.filter(page => page !== null);
+  
+    // If no valid page data, return without exporting
+    if (validPageData.length === 0) {
+      toast.error(`Page chosen has no content or does not exist.`);
+      return;
+    }
   
     // Create a new ZIP archive 
     const zip = new JSZip();
@@ -92,7 +110,7 @@ const Home = () => {
     const cssFolder = zip.folder('css');
   
     // Add the HTML and CSS for each page to the ZIP archive 
-    pageData.forEach(({ html, css, assets, pageId, name }) => {
+    validPageData.forEach(({ html, css, assets, pageId, name }) => {
       if (html) {
         // Construct HTML content with proper structure
         const htmlContent = `
@@ -133,11 +151,14 @@ const Home = () => {
   
     // Generate the ZIP archive 
     zip.generateAsync({ type: 'blob' }).then((content) => {
+      toast.success(`Page successfully exported.`);
       saveAs(content, 'pages.zip');
     });
   
     setSelectedPages([]);
   };
+  
+  
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
