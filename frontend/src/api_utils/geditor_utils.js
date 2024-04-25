@@ -405,6 +405,7 @@ export const layerManager = {
 
 export const traitManager = {
   appendTo: "#trait-container",
+  
 };
 
 export const selectorManager = {
