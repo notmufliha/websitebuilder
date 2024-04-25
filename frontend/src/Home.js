@@ -96,7 +96,7 @@ const Home = () => {
           const filename = `images/${pageId}_image_${index + 1}.jpg`;
           // Fetch assets and add them to the zip
           // Adjust the path as per your server setup
-          fetch(asset.src,{ mode: 'no-cors' })
+          fetch(asset.src, { mode: 'no-cors' })
             .then(response => response.blob())
             .then(blob => {
               zip.file(filename, blob);
@@ -116,62 +116,6 @@ const Home = () => {
 
     setSelectedPages([]);
   };
-
-
-  // Fetch the HTML and CSS for each selected page from the backend
-  // const pageDataPromises = selectedPages.map(pageId =>
-  //     fetch(`http://localhost:8080/api/pages/${pageId}`)
-  //     .then(response => {
-  //       console.log(response.text())
-  //         if (!response.ok) {
-  //             throw new Error('Network response was not ok');
-  //         }
-  //         return response.text(); // Get the raw text content
-  //     })
-  //     .then(data => ({
-  //         html: data, // Assign HTML directly
-  //         pageId
-  //     }))
-  //     .catch(error => console.error('Error fetching page data:', error))
-  // );
-
-  // var parser = new DOMParser();
-
-  // Parse the text
-  // var doc = parser.parseFromString(html, "text/html");
-
-  // // Wait for all page data to be fetched 
-  // const pageData = await Promise.all(pageDataPromises);
-
-  // Create a new ZIP archive 
-  // const zip = new JSZip();
-
-  // Add the HTML for each page to the ZIP archive 
-  // pageData.forEach(({ html, pageId }) => {
-  //     const htmlContent = `
-  //         <html lang="en">
-  //         <head>
-  //             <meta charset="utf-8">
-  //             <link rel="stylesheet" href="./css/style.css">
-  //         </head>
-  //         <body>
-  //             ${html}
-  //         </body>
-  //         </html>
-  //     `;
-  //     zip.file(`page_${pageId}/index.html`, htmlContent);
-  // });
-
-  // // Generate the ZIP archive 
-  // zip.generateAsync({ type: 'blob' }).then((content) => {
-  //     saveAs(content, 'pages.zip');
-  // });
-
-  // Clear selected pages after export 
-
-
-
-
 
   return (
     <div className="container py-5">
@@ -271,6 +215,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      
     </div>
   );
 };
