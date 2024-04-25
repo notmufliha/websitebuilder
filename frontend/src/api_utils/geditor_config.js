@@ -5,6 +5,7 @@ import grapesjsBlockBootstrap from "grapesjs-blocks-bootstrap4";
 import grapesjsPluginExport from "grapesjs-plugin-export";
 import grapesjsStyleBg from "grapesjs-style-bg";
 import { API_HOST } from ".";
+import axios from "axios";
 import {
   addEditorCommand,
   deviceManager,
@@ -23,7 +24,8 @@ import swiperComponent from "../plugins/swiper";
 import gjsnavbar from "../plugins/navbar";
 import chartLibComponent from "../plugins/charts";
 
-const geditorConfig = (assets, pageId) => {
+const geditorConfig = (pageId, assets) => {
+  console.log('Starting geditorConfig...');
   $(".panel__devices").html("");
   $(".panel__basic-actions").html("");
   $(".panel__editor").html("");
@@ -48,61 +50,36 @@ const geditorConfig = (assets, pageId) => {
     selectorManager: selectorManager,
     panels: panels,
     deviceManager: deviceManager,
-    // assetManager: {
-    //   upload: `${API_HOST}uploads/`, // Endpoint for uploading files
-    //   uploadName: 'myImage', // Name of the POST parameter to pass files
-    //   multiUpload: false, // Allow uploading multiple files at once
-    //   add: function (asset, opts) {
-    //     // Function to add an asset after it's uploaded
-    //     console.log('Asset added', asset);
-    //   },
-    //   uploadFile: function (e) {
-    //     var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
-    //     var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0]; // Only take the first file
-    //     // Create a FormData object
-    //     var formData = new FormData();
-    //     formData.append('myImage', file);
 
-    //     // Send the request
-    //     $.ajax({
-    //       url: this.upload,
-    //       type: 'POST',
-    //       data: formData,
-    //       contentType: false,
-    //       // crossDomain: true,
-    //       dataType: 'json',
-    //       mimeType: "multipart/form-data",
-    //       processData: false,
-    //       success: function (result) {
-    //         console.log('Result: ', result);
-    //         // Assuming result contains the path to the image, e.g., result.imageUrl
-    //         // Add the uploaded image to the assets in the GrapesJS Asset Manager
-    //         editor.AssetManager.addAsset({
-    //           src: result.imageUrl,
-    //           name: result.file.fileName
-    //         });
-    //       },
-    //       error: function (xhr, status, err) {
-    //         console.error('Upload error: ', err);
-    //       },
-    //     });
-    //   },
-
-    //   uploadText: 'Drop files here or click to upload',
-    // },
     assetManager: {
-      upload: `${API_HOST}uploads/`, // Endpoint for uploading files
+      assets: assets,
+      upload: `${API_HOST}uploads`, // Endpoint for uploading files 
       uploadName: 'myImage', // Name of the POST parameter to pass files
-      multiUpload: false, 
       uploadFile: function (e) {
+        console.log('uploadFile triggered'); // Check if function is triggered
+
+        // Check if event is triggered with correct data
+        if (e.dataTransfer) {
+          console.log('Files dropped', e.dataTransfer.files);
+        } else if (e.target) {
+          console.log('Files selected', e.target.files);
+        }
+
         var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+        // Check if files are found
+        console.log('Files array', files);
+
         if (files.length > 0) {
           var file = files[0]; // Only take the first file
+          console.log('Uploading file:', file.name); // Log the file name being uploaded
+
+          // Create a FormData object
           var formData = new FormData();
           formData.append('myImage', file);
-    
+
+          // Send the request
           $.ajax({
-            url: this.upload,
+            url: `${API_HOST}uploads`,
             type: 'POST',
             data: formData,
             contentType: false,
@@ -110,7 +87,11 @@ const geditorConfig = (assets, pageId) => {
             mimeType: "multipart/form-data",
             processData: false,
             success: function (result) {
-              editor.AssetManager.addAsset({
+              console.log('Upload successful, server result:', result);
+              // Assuming result contains the path to the image, e.g., result.imageUrl
+              // Add the uploaded image to the assets in the GrapesJS Asset Manager
+              editor.AssetManager.add({
+                id: result.file._id,
                 src: result.imageUrl,
                 name: result.file.fileName
               });
@@ -119,66 +100,10 @@ const geditorConfig = (assets, pageId) => {
               console.error('Upload error: ', status, err);
             },
           });
-        } else {
-          console.log('No files to upload');
+
         }
       },
-    
-      uploadText: 'Drop files here or click to upload',// Allow uploading multiple files at once
-      // add: function (asset, opts) {
-      //   // Function to add an asset after it's uploaded
-      //   console.log('Asset added', asset);
-      // },
-      // uploadFile: function (e) {
-      //   console.log('uploadFile triggered'); // Check if function is triggered
-
-      //   // Check if event is triggered with correct data
-      //   if (e.dataTransfer) {
-      //     console.log('Files dropped', e.dataTransfer.files);
-      //   } else if (e.target) {
-      //     console.log('Files selected', e.target.files);
-      //   }
-
-      //   var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
-      //   // Check if files are found
-      //   console.log('Files array', files);
-
-      //   if (files.length > 0) {
-      //     var file = files[0]; // Only take the first file
-      //     console.log('Uploading file:', file.name); // Log the file name being uploaded
-
-      //     // Create a FormData object
-      //     var formData = new FormData();
-      //     formData.append('myImage', file);
-
-      //     // Send the request
-      //     $.ajax({
-      //       url: this.upload,
-      //       type: 'POST',
-      //       data: formData,
-      //       contentType: false,
-      //       dataType: 'json',
-      //       mimeType: "multipart/form-data",
-      //       processData: false,
-      //       success: function (result) {
-      //         console.log('Upload successful, server result:', result);
-      //         // Assuming result contains the path to the image, e.g., result.imageUrl
-      //         // Add the uploaded image to the assets in the GrapesJS Asset Manager
-      //         editor.AssetManager.addAsset({
-      //           src: result.imageUrl,
-      //           name: result.file.fileName
-      //         });
-      //       },
-      //       error: function (xhr, status, err) {
-      //         console.error('Upload error: ', status, err);
-      //       },
-      //     });
-      //   } else {
-      //     console.log('No files to upload');
-      //   }
-      // },
-
-      // uploadText: 'Drop files here or click to upload',
+      uploadText: 'Drop files here or click to upload',
     },
 
     storageManager: storageSetting(pageId),
@@ -207,6 +132,34 @@ const geditorConfig = (assets, pageId) => {
       chartLibComponent: {},
     },
   });
+
+  editor.on('asset:remove', (asset) => {
+    // Log the entire asset object to see all available properties
+    console.log('Asset to remove:', asset);
+
+    // Get the asset ID
+    const assetId = asset.get('id'); // Ensure 'id' is the correct property name that holds the unique identifier for the asset
+    console.log('Asset ID to remove:', assetId);
+
+    if (!assetId) {
+      console.error('No asset ID found, asset removal aborted.');
+      return; // Stop further execution if assetId is not found
+    }
+
+    // Construct the URL for the DELETE request
+    const url = `${API_HOST}uploads/${assetId}`;
+    console.log('DELETE request URL:', url);
+
+    // Call the backend endpoint to delete the asset
+    axios.delete(url)
+      .then(response => {
+        console.log('Image deleted successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Failed to delete image:', error);
+      });
+  });
+
 
   addEditorCommand(editor);
   editor.on("run:preview", () => {
@@ -250,6 +203,20 @@ const geditorConfig = (assets, pageId) => {
       component.set("toolbar", defaultToolbar);
     }
   });
+
+  editor.BlockManager.add('youtube-video', {
+    label: 'YouTube',
+    content: {
+      type: 'video',
+      // src: 'https://www.youtube.com/watch?v=C4EGWQe4FJM',
+      style: {
+        height: '280px',
+        width: '500px'
+      }
+    },
+    category: 'Media',
+  });
+
 
   setTimeout(() => {
     let categories = editor.BlockManager.getCategories();

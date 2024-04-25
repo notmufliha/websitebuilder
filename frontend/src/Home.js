@@ -97,12 +97,13 @@ const Home = () => {
           const filename = `images/${pageId}_image_${index + 1}.jpg`;
           // Fetch assets and add them to the zip
           // Adjust the path as per your server setup
-          fetch(asset.src,{ mode: 'no-cors' })
+          fetch(asset.src, { mode: 'no-cors' })
             .then(response => response.blob())
             .then(blob => {
               zip.file(filename, blob);
             })
             .catch(error => console.error('Error fetching asset:', error));
+
         });
 
         zip.file(`page_${pageId}/index.html`, htmlContent);
