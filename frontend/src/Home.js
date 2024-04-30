@@ -37,6 +37,8 @@ const Home = () => {
     }
   };
 
+
+
   const confirmDelete = async (pageId) => {
     if (window.confirm("Are you sure you want to delete this page?")) {
       handleDelete(pageId);
@@ -54,6 +56,8 @@ const Home = () => {
       toast.error("Error deleting page.");
     }
   };
+
+
 
   const handlePageCheckboxChange = (pageId) => {
     if (selectedPages.includes(pageId)) {
@@ -150,13 +154,104 @@ const Home = () => {
     });
   
     // Generate the ZIP archive 
-    zip.generateAsync({ type: 'blob' }).then((content) => {
+    zip.generateAsync({ type: 'blob' }).then(async (content) => {
       toast.success(`Page successfully exported.`);
       saveAs(content, 'pages.zip');
     });
   
     setSelectedPages([]);
   };
+  
+
+  const handleExport2 = async () => {
+    const pageDataPromises = selectedPages.map(async (pageId) => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
+        const data = await response.json();
+  
+        // Check if data or content is null or empty
+        if (!data || !data.content || !data.content['mycustom-html']) {
+          // Notify user if the page data is null or empty
+          toast.error(`Page ${data.name} has no content or does not exist.`);
+          return null;
+        }
+  
+        // Clean the HTML string
+        const cleanedHTML = data.content['mycustom-html'];
+        const cleanedCSS = data.content['mycustom-css'];
+        const cleanedComponents = JSON.parse(data.content['mycustom-components']);
+        const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
+  
+        return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
+  
+      } catch (error) {
+        console.error('Error fetching page data:', error);
+        // Notify user if there's an error fetching page data
+        toast.error('Error fetching page data. Please try again later.');
+        return null;
+      }
+    });
+  
+    // Wait for all page data promises to resolve
+    const pageData = await Promise.all(pageDataPromises);
+  
+    // Filter out null entries before further processing
+    const validPageData = pageData.filter(page => page !== null);
+  
+    // If no valid page data, return without exporting
+    if (validPageData.length === 0) {
+      toast.error(`Page chosen has no content or does not exist.`);
+      return;
+    }
+  
+    const filesArray = [];
+  
+    // Add HTML and CSS files to the filesArray
+    validPageData.forEach(({ html, css, name }) => {
+      if (html && css) {
+        // Construct HTML content with proper structure
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${name}</title>
+            <link rel="stylesheet" href="style_${name.replace(/\s/g, '_').toLowerCase()}.css">
+          </head>
+          <body>
+            ${html}
+          </body>
+          </html>
+        `;
+        filesArray.push({ name: `${name}.html`, content: htmlContent });
+        filesArray.push({ name: `style_${name.replace(/\s/g, '_').toLowerCase()}.css`, content: css });
+      }
+    });
+  
+    try {
+      // Send the HTML and CSS files array to the server using fetch
+      const response = await fetch('http://localhost:8080/api/pages/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ files: filesArray }),
+      });
+  
+      if (response.ok) {
+        toast.success(`Page successfully exported.`);
+      } else {
+        toast.error(`Failed to export page. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error exporting page:', error);
+      toast.error(`Failed to export page. ${error.message}`);
+    }
+  
+    setSelectedPages([]);
+};
+
   
   
   return (
@@ -213,6 +308,14 @@ const Home = () => {
             disabled={selectedPages.length === 0} // Disable the button if no pages are selected
           >
             Export
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary mb-3"
+            onClick={handleExport2}
+            disabled={selectedPages.length === 0} // Disable the button if no pages are selected
+          >
+            Testing
           </button>
           <div className="table-responsive">
             <table className="table table-striped table-hover">
