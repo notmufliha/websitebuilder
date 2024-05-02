@@ -486,7 +486,7 @@ const Home = () => {
        <div style={{ marginTop: '20px' }}>
           <button
             type="button"
-            style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', marginBottom: '10px' }}
+            style={{ padding: '10px 20px', marginRight: '10px',background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
             onClick={handleExport}
             disabled={selectedPages.length === 0}
           >
@@ -494,7 +494,7 @@ const Home = () => {
           </button>
           <button
             type="button"
-            className="btn btn-primary mb-3"
+            style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
             onClick={handleExport2}
             disabled={selectedPages.length === 0} // Disable the button if no pages are selected
           >
