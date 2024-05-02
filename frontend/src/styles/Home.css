@@ -1,4 +1,4 @@
-.btn-info {
+/* .btn-info {
     color: #fff;
     background-color: #17a2b8;
     border-color: #17a2b8;
@@ -27,5 +27,100 @@
     background-color: #343a40;
     color: #fff;
 }
+ */
 
-
+/* Button Enhancements */
+.btn-info {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  
+  .btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+  }
+  
+  /* Card Enhancements */
+  .card-header, .card-footer {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 10px 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  
+  .card-footer {
+    border-top: 1px solid #e3e6f0;
+    text-align: right;
+  }
+  
+  .card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+  }
+  
+  /* Typography & Layout Enhancements */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+  
+  .container {
+    max-width: 960px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+  }
+  
+  .form-control.is-invalid {
+    border-color: #dc3545;
+  }
+  
+  .invalid-feedback {
+    color: #dc3545;
+  }
+  
+  /* Table Styling Enhancements */
+  .table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+  
+  .table th, .table td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .table-dark {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Responsive settings */
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+    }
+  }
+  
+  /* Additional aesthetic improvements */
+  input[type="text"], input[type="checkbox"] {
+    margin-right: 10px;
+  }

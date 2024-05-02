@@ -1,4 +1,5 @@
 import express from 'express';
+import { exec } from 'child_process';
 import {
   changeContent,
   create,
@@ -13,6 +14,27 @@ const path = require('path');
 const { Client } = require('ssh2');
 
 const pageRoute = express.Router();
+
+// Rsync function to sync files to VM
+const syncToVM = (req, res) => {
+  const rsyncCommand = 'wsl rsync -avz --delete /mnt/c/Users/exc/Downloads/EXPORTS/ user@192.168.28.129:/var/www/html/';
+
+  exec(rsyncCommand, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).send({ message: 'Sync failed', error: error.message });
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+    res.send({ message: 'Sync successful', details: stdout });
+  });
+};
+
+// Define the route for syncing files
+pageRoute.post('/sync-to-vm', syncToVM);
+
+
+
 pageRoute.post('/', create);
 pageRoute.post('/:pageId/content', changeContent);
 

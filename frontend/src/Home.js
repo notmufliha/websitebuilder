@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { createPage } from "./redux/actions/pageAction";
 import { deletePage } from "./redux/actions/pageAction";
-import "./styles/Home.css";
+// import "./styles/Home.css";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
+import axios from "axios";
 
 
 const Home = () => {
@@ -20,8 +21,7 @@ const Home = () => {
 
   const { pageStore } = useSelector((state) => state);
   const { pages } = pageStore;
-  console.log(pages)
-
+  
   const handleSubmit = async () => {
     if (!name) {
       setIsValid(false);
@@ -66,10 +66,191 @@ const Home = () => {
       setSelectedPages([...selectedPages, pageId]);
     }
   };
+
+  // const handleExport = async () => {
+  //   const pageDataPromises = selectedPages.map(async (pageId) => {
+  //     try {
+  //       const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
+  //       const data = await response.json();
+  
+  //       // Clean the HTML string
+  //       const cleanedHTML = data.content['mycustom-html'];
+  //       const cleanedCSS = data.content['mycustom-css'];
+  //       const cleanedComponents = JSON.parse(data.content['mycustom-components']);
+  //       const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
+  
+  //       return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
+  
+  //     } catch (error) {
+  //       console.error('Error fetching page data:', error);
+  //       return null;
+  //     }
+  //   });
+  
+  //   // Wait for all page data promises to resolve
+  //   const pageData = await Promise.all(pageDataPromises);
+  
+  //   // Create a new ZIP archive 
+  //   const zip = new JSZip();
+  
+  //   // Create a CSS folder
+  //   const cssFolder = zip.folder('css');
+  
+  //   // Add the HTML and CSS for each page to the ZIP archive 
+  //   pageData.forEach(({ html, css, assets, pageId, name }) => {
+  //     if (html) {
+  //       // Construct HTML content with proper structure
+  //       const htmlContent = `
+  //         <!DOCTYPE html>
+  //         <html lang="en">
+  //         <head>
+  //           <meta charset="UTF-8">
+  //           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  //           <title>${name}</title>
+  //           <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
+  //         </head>
+  //         <body>
+  //           ${html}
+  //         </body>
+  //         </html>
+  //       `;
+  
+  //       // Add HTML file to the ZIP archive
+  //       zip.file(`${name}.html`, htmlContent);
+  
+  //       // Add CSS file to the CSS folder with naming convention style_pagename.css
+  //       cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
+  
+  //       // Add assets to the ZIP archive
+  //       assets.forEach((asset, index) => {
+  //         const filename = `images/${pageId}_image_${index + 1}.jpg`;
+  //         // Fetch assets and add them to the ZIP
+  //         // Adjust the path as per your server setup
+  //         fetch(asset.src, { mode: 'no-cors' })
+  //           .then(response => response.blob())
+  //           .then(blob => {
+  //             zip.file(filename, blob);
+  //           })
+  //           .catch(error => console.error('Error fetching asset:', error));
+  //       });
+  //     }
+  //   });
+  
+  //   // Generate the ZIP archive 
+  //   zip.generateAsync({ type: 'blob' }).then((content) => {
+  //     saveAs(content, 'pages.zip');
+  //   });
+  
+  //   setSelectedPages([]);
+  // };
+  
+  // return (
+  //   <div className="container py-5">
+  //     <div className="row justify-content-center">
+  //       <div className="col-md-8">
+  //         <form id="create-page">
+  //           <div className="card">
+  //             <div className="card-header">
+  //               <h5>Create a New Page</h5>
+  //             </div>
+  //             <div className="card-body">
+  //               <div className="mb-3">
+  //                 <label htmlFor="name" className="form-label">Page Name</label>
+  //                 <input
+  //                   type="text"
+  //                   className={`form-control ${isValid ? "" : "is-invalid"}`}
+  //                   id="name"
+  //                   placeholder="Enter page name"
+  //                   value={name}
+  //                   onChange={(e) => setName(e.target.value)}
+  //                 />
+  //                 {!isValid && (
+  //                   <div className="invalid-feedback">
+  //                     Please provide a valid name.
+  //                   </div>
+  //                 )}
+  //               </div>
+  //             </div>
+  //             <div className="card-footer text-end">
+  //               <button
+  //                 type="button"
+  //                 className="btn btn-secondary me-2"
+  //                 onClick={() => setName("")}
+  //               >
+  //                 Clear
+  //               </button>
+  //               <button
+  //                 type="button"
+  //                 className="btn btn-primary"
+  //                 onClick={handleSubmit}
+  //               >
+  //                 Save
+  //               </button>
+  //             </div>
+  //           </div>
+  //         </form>
+  //       </div>
+  //       <div className="col-md-12 mt-4">
+  //         <button
+  //           type="button"
+  //           className="btn btn-primary mb-3"
+  //           onClick={handleExport}
+  //           disabled={selectedPages.length === 0} // Disable the button if no pages are selected
+  //         >
+  //           Export
+  //         </button>
+  //         <div className="table-responsive">
+  //           <table className="table table-striped table-hover">
+  //             <thead className="table-dark">
+  //               <tr>
+  //                 <th>ID</th>
+  //                 <th>Name</th>
+  //                 <th>Slug</th>
+  //                 <th>Action</th>
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               {pages && pages.length > 0 ? pages.map((page) => (
+  //                 <tr key={page._id}>
+  //                   <td>
+  //                     <input
+  //                       type="checkbox"
+  //                       value={page._id}
+  //                       checked={selectedPages.includes(page._id)}
+  //                       onChange={() => handlePageCheckboxChange(page._id)}
+  //                     />
+  //                   </td>
+  //                   <td>{page._id}</td>
+  //                   <td>{page.name}</td>
+  //                   <td>{page.slug}</td>
+  //                   <td>
+  //                     <Link to={`/editor/${page._id}`} className="btn btn-info btn-sm">Edit</Link>
+  //                     <button
+  //                       type="button"
+  //                       className="btn btn-primary"
+  //                       onClick={() => confirmDelete(page._id)} 
+  //                     >
+  //                       Delete
+  //                     </button>
+  //                   </td>
+  //                 </tr>
+  //               )) : (
+  //                 <tr><td colSpan="4" className="text-center">No pages found</td></tr>
+  //               )}
+  //             </tbody>
+  //           </table>
+  //         </div>
+  //       </div>
+  //     </div>
+  //     <ToastContainer />
+  //   </div>
+  // );
+
   const handleExport = async () => {
     const pageDataPromises = selectedPages.map(async (pageId) => {
       try {
         const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
+        if (!response.ok) throw new Error('Network response was not ok.');
         const data = await response.json();
   
         // Check if data or content is null or empty
@@ -84,9 +265,9 @@ const Home = () => {
         const cleanedCSS = data.content['mycustom-css'];
         const cleanedComponents = JSON.parse(data.content['mycustom-components']);
         const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
-  
+
         return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
-  
+
       } catch (error) {
         console.error('Error fetching page data:', error);
         // Notify user if there's an error fetching page data
@@ -94,7 +275,7 @@ const Home = () => {
         return null;
       }
     });
-  
+
     // Wait for all page data promises to resolve
     const pageData = await Promise.all(pageDataPromises);
   
@@ -109,7 +290,7 @@ const Home = () => {
   
     // Create a new ZIP archive 
     const zip = new JSZip();
-  
+
     // Create a CSS folder
     const cssFolder = zip.folder('css');
   
@@ -131,13 +312,13 @@ const Home = () => {
           </body>
           </html>
         `;
-  
+
         // Add HTML file to the ZIP archive
         zip.file(`${name}.html`, htmlContent);
-  
+
         // Add CSS file to the CSS folder with naming convention style_pagename.css
         cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
-  
+
         // Add assets to the ZIP archive
         assets.forEach((asset, index) => {
           const filename = `images/${pageId}_image_${index + 1}.jpg`;
@@ -217,7 +398,7 @@ const Home = () => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${name}</title>
-            <link rel="stylesheet" href="style_${name.replace(/\s/g, '_').toLowerCase()}.css">
+            <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
           </head>
           <body>
             ${html}
@@ -255,57 +436,59 @@ const Home = () => {
   
   
   return (
-    <div className="container py-5">
-      <div className="row justify-content-center">
-        <div className="col-md-8">
-          <form id="create-page">
-            <div className="card">
-              <div className="card-header">
-                <h5>Create a New Page</h5>
-              </div>
-              <div className="card-body">
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label">Page Name</label>
-                  <input
-                    type="text"
-                    className={`form-control ${isValid ? "" : "is-invalid"}`}
-                    id="name"
-                    placeholder="Enter page name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  {!isValid && (
-                    <div className="invalid-feedback">
-                      Please provide a valid name.
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="card-footer text-end">
-                <button
-                  type="button"
-                  className="btn btn-secondary me-2"
-                  onClick={() => setName("")}
-                >
-                  Clear
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSubmit}
-                >
-                  Save
-                </button>
-              </div>
+    <div style={{ paddingTop: '40px', fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ maxWidth: '800px', margin: 'auto' }}>
+        <form>
+          <div style={{ background: '#f7f7f7', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid #ddd' }}>
+              <h5>Create a New Page</h5>
             </div>
-          </form>
-        </div>
-        <div className="col-md-12 mt-4">
+            <div style={{ padding: '20px' }}>
+              <label htmlFor="name" style={{ display: 'block', marginBottom: '10px' }}>Page Name</label>
+              <input
+                type="text"
+                style={{
+                  width: '100%', padding: '10px', borderRadius: '4px',
+                  border: `1px solid ${isValid ? '#ccc' : '#ff4d4f'}`,
+                  boxShadow: `0 0 0 ${isValid ? '0' : '1px'} #ff4d4f inset`
+                }}
+                id="name"
+                placeholder="Enter page name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              {!isValid && (
+                <div style={{ color: '#ff4d4f', marginTop: '5px' }}>
+                  Please provide a valid name.
+                </div>
+              )}
+            </div>
+            <div style={{ padding: '20px', borderTop: '1px solid #ddd', textAlign: 'right' }}>
+              <button
+                type="button"
+                style={{ padding: '10px 20px', marginRight: '10px', background: '#ccc', border: 'none', borderRadius: '4px' }}
+                onClick={() => setName("")}
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+                onClick={handleSubmit}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+       
+       
+       <div style={{ marginTop: '20px' }}>
           <button
             type="button"
-            className="btn btn-primary mb-3"
+            style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', marginBottom: '10px' }}
             onClick={handleExport}
-            disabled={selectedPages.length === 0} // Disable the button if no pages are selected
+            disabled={selectedPages.length === 0}
           >
             Export
           </button>
@@ -321,16 +504,16 @@ const Home = () => {
             <table className="table table-striped table-hover">
               <thead className="table-dark">
                 <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Action</th>
+                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Select</th>
+                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Name</th>
+                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Slug</th>
+                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {pages && pages.length > 0 ? pages.map((page) => (
                   <tr key={page._id}>
-                    <td>
+                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>
                       <input
                         type="checkbox"
                         value={page._id}
@@ -338,22 +521,21 @@ const Home = () => {
                         onChange={() => handlePageCheckboxChange(page._id)}
                       />
                     </td>
-                    <td>{page._id}</td>
-                    <td>{page.name}</td>
-                    <td>{page.slug}</td>
-                    <td>
-                      <Link to={`/editor/${page._id}`} className="btn btn-info btn-sm">Edit</Link>
+                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>{page._id}</td>
+                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>{page.name}</td>
+                                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>
+                      <Link to={`/editor/${page._id}`} style={{ padding: '5px 10px', background: '#17a2b8', color: '#fff', borderRadius: '4px', textDecoration: 'none' }}>Edit</Link>
                       <button
                         type="button"
-                        className="btn btn-primary"
-                        onClick={() => handleDelete(page._id)} // Set the ID for deletion
+                        style={{ padding: '5px 10px', marginLeft: '10px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px' }}
+                        onClick={() => confirmDelete(page._id)}
                       >
                         Delete
                       </button>
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="4" className="text-center">No pages found</td></tr>
+                  <tr><td colSpan="5" style={{ textAlign: 'center', padding: '10px', border: '1px solid #ddd' }}>No pages found</td></tr>
                 )}
               </tbody>
             </table>
