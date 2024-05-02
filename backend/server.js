@@ -25,7 +25,8 @@ app.use('/resources', express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-const mongoUri = 'mongodb+srv://dariuschew1050:e0Lw6qNiRBs5wYqF@webpagebuilder.kvkmygy.mongodb.net/?retryWrites=true&w=majority&appName=webpagebuilder';
+const mongoUri =
+  'mongodb+srv://dariuschew1050:e0Lw6qNiRBs5wYqF@webpagebuilder.kvkmygy.mongodb.net/?retryWrites=true&w=majority&appName=webpagebuilder';
 mongoose.connect(
   mongoUri,
   {
@@ -44,37 +45,61 @@ mongoose.connect(
 );
 
 // Routes with added console logs
-app.use('/api/projects', (req, res, next) => {
-  console.log('Accessing /api/projects');
-  next();
-}, projectRoute);
+app.use(
+  '/api/projects',
+  (req, res, next) => {
+    console.log('Accessing /api/projects');
+    next();
+  },
+  projectRoute,
+);
 
-app.use('/api/pages', (req, res, next) => {
-  console.log('Accessing /api/pages');
-  next();
-}, pageRoute);
+app.use(
+  '/api/pages',
+  (req, res, next) => {
+    console.log('Accessing /api/pages');
+    next();
+  },
+  pageRoute,
+);
 
-app.use('/api/assets', (req, res, next) => {
-  console.log('Accessing /api/assets');
-  next();
-}, assetRoute);
+app.use(
+  '/api/assets',
+  (req, res, next) => {
+    console.log('Accessing /api/assets');
+    next();
+  },
+  assetRoute,
+);
 
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
-app.use('/api/uploads', (req, res, next) => {
-  console.log('Accessing /api/uploads');
-  next();
-}, uploadRoute);
+app.use(
+  '/api/uploads',
+  (req, res, next) => {
+    console.log('Accessing /api/uploads');
+    next();
+  },
+  uploadRoute,
+);
 
-app.use('/api/', (req, res, next) => {
-  console.log('Accessing /api/');
-  next();
-}, uiRoute);
+app.use(
+  '/api/',
+  (req, res, next) => {
+    console.log('Accessing /api/');
+    next();
+  },
+  uiRoute,
+);
 
-app.get('/:pageId?', (req, res, next) => {
-  console.log('Accessing /:pageId?', req.params);
-  next();
-}, renderHtml);
+app.get(
+  '/:pageId?',
+  (req, res, next) => {
+    console.log('Accessing /:pageId?', req.params);
+    next();
+  },
+  renderHtml,
+);
 
 const PORT = process.env.APP_PORT || 8080;
 app.listen(PORT, () => {
