@@ -405,7 +405,7 @@ export const layerManager = {
 
 export const traitManager = {
   appendTo: "#trait-container",
-  
+
 };
 
 export const selectorManager = {
@@ -537,8 +537,8 @@ export const addEditorCommand = (editor) => {
 
   editor.Commands.add("export", {
     run: (editor) => {
-      editor.runCommand("gjs-export-zip")
-      console.log(editor)
+      // editor.runCommand("gjs-export-zip")
+      console.log(editor.editor)
       //  alert(`Select page to export:\n${dropdownHTML}`);
     }
   });
