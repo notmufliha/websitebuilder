@@ -10,6 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import axios from "axios";
+const cheerio = require('cheerio');
 
 
 const Home = () => {
@@ -115,9 +116,51 @@ const Home = () => {
     // Create a CSS folder
     const cssFolder = zip.folder('css');
 
+    function createTemplatePlaceholders(html) {
+      const userInputPlaceholder = "{{userInputPlaceholder}}";
+      const tagPlaceholders = {
+        a: true,
+        div: true,
+        img: true,
+        video: true,
+        iframe: true,
+      };
+
+      let template = html;
+      let index = 1;
+
+      for (const [tag, _] of Object.entries(tagPlaceholders)) {
+        const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, "g");
+        template = template.replace(regex, (match, startTag, innerText, endTag) => {
+          const idMatch = startTag.match(/id="([^"]*)"/);
+          const idAttribute = idMatch ? idMatch[0] : ''; // Keep id attribute if exists
+          const classMatch = startTag.match(/class="([^"]*)"/);
+          const classAttribute = classMatch ? classMatch[0] : ''; // Keep class attribute if exists
+          const replacedStartTag = startTag.replace(); // Remove id and class attributes
+          return `${replacedStartTag}${userInputPlaceholder}${endTag}`;
+        });
+        index++;
+      }
+
+      // Replace src, width, height, and other attributes
+      const attributeRegex = /(\w+)=("[^"]*")/g;
+      template = template.replace(attributeRegex, (match, attributeName, attributeValue) => {
+        console.log(attributeName)
+        if (attributeName !== 'id' && attributeName !== 'class' && attributeName !== 'gjs') {
+          return `${attributeName}=${userInputPlaceholder}`;
+        }
+        return match;
+      });
+
+      return template;
+    }
+
     // Add the HTML and CSS for each page to the ZIP archive 
     validPageData.forEach(({ html, css, assets, pageId, name }) => {
+      const html2 = createTemplatePlaceholders(html);
+      console.log(html2)
       if (html) {
+        
         // Construct HTML content with proper structure
         const htmlContent = `
           <!DOCTYPE html>
@@ -129,7 +172,7 @@ const Home = () => {
             <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
           </head>
           <body>
-            ${html}
+            ${html2}
           </body>
           </html>
         `;
@@ -154,6 +197,8 @@ const Home = () => {
         });
       }
     });
+
+
 
     // Generate the ZIP archive 
     zip.generateAsync({ type: 'blob' }).then(async (content) => {
@@ -307,7 +352,7 @@ const Home = () => {
         <div style={{ marginTop: '20px' }}>
           <button
             type="button"
-            style={{ padding: '10px 20px', marginRight: '10px',background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+            style={{ padding: '10px 20px', marginRight: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
             onClick={handleExport}
             disabled={selectedPages.length === 0}
           >

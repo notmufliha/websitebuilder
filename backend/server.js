@@ -8,6 +8,7 @@ import assetRoute from './assets/assets.route';
 import projectRoute from './project/project.route';
 import renderHtml from './render/render.controller';
 import uploadRoute from './uploads/upload.route';
+const controller = require('./controller/postsController');
 
 // Initialize App
 const app = express();
@@ -99,6 +100,14 @@ app.get(
     next();
   },
   renderHtml,
+);
+app.use(
+  '/api/pages/sql',
+  (req, res, next) => {
+    console.log('Accessing /api/pages/sql');
+    next();
+  },
+  controller.getAllPages,
 );
 
 

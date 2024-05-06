@@ -537,7 +537,7 @@ export const addEditorCommand = (editor) => {
 
   editor.Commands.add("export", {
     run: (editor) => {
-      // editor.runCommand("gjs-export-zip")
+      editor.runCommand("gjs-export-zip")
       console.log(editor.editor)
       //  alert(`Select page to export:\n${dropdownHTML}`);
     }
