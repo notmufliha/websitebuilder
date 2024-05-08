@@ -6,16 +6,15 @@ import { deletePage } from "./redux/actions/pageAction";
 // import "./styles/Home.css";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { toast } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import axios from "axios";
-const cheerio = require('cheerio');
-
+const cheerio = require("cheerio");
 
 const Home = () => {
   const [name, setName] = useState("");
-  const [selectedPages, setSelectedPages] = useState([])
+  const [selectedPages, setSelectedPages] = useState([]);
   const [idToDelete, setIdToDelete] = useState("");
   const [isValid, setIsValid] = useState(true);
   const dispatch = useDispatch();
@@ -31,14 +30,12 @@ const Home = () => {
     }
     try {
       await createPage(name)(dispatch);
-      setName('');
+      setName("");
       toast.success("Page created successfully!");
     } catch (error) {
       toast.error("Failed to create page.");
     }
   };
-
-
 
   const confirmDelete = async (pageId) => {
     if (window.confirm("Are you sure you want to delete this page?")) {
@@ -58,8 +55,6 @@ const Home = () => {
     }
   };
 
-
-
   const handlePageCheckboxChange = (pageId) => {
     if (selectedPages.includes(pageId)) {
       setSelectedPages(selectedPages.filter((id) => id !== pageId));
@@ -68,44 +63,222 @@ const Home = () => {
     }
   };
 
+  // const handleExport = async () => {
+  //   try {
+  //     const generateBackendResponse = await fetch('http://localhost:8080/api/generateAndSendBackend', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({ /* Any necessary parameters */ })
+  //     });
+  //     if (!generateBackendResponse.ok) {
+  //       throw new Error('Error generating backend');
+  //     }
+
+  //     const pageDataPromises = selectedPages.map(async (pageId) => {
+  //       try {
+  //         const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
+  //         if (!response.ok) throw new Error('Network response was not ok.');
+  //         const data = await response.json();
+
+  //         // Check if data or content is null or empty
+  //         if (!data || !data.content || !data.content['mycustom-html']) {
+  //           // Notify user if the page data is null or empty
+  //           toast.error(`Page ${data.name} has no content or does not exist.`);
+  //           return null;
+  //         }
+
+  //         // Clean the HTML string
+  //         const cleanedHTML = data.content['mycustom-html'];
+  //         const cleanedCSS = data.content['mycustom-css'];
+  //         const cleanedComponents = JSON.parse(data.content['mycustom-components']);
+  //         const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
+
+  //         return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
+
+  //       } catch (error) {
+  //         console.error('Error fetching page data:', error);
+  //         // Notify user if there's an error fetching page data
+  //         toast.error('Error fetching page data. Please try again later.');
+  //         return null;
+  //       }
+  //     });
+
+  //     // Wait for all page data promises to resolve
+  //     const pageData = await Promise.all(pageDataPromises);
+
+  //     // Filter out null entries before further processing
+  //     const validPageData = pageData.filter(page => page !== null);
+
+  //     // If no valid page data, return without exporting
+  //     if (validPageData.length === 0) {
+  //       toast.error(`Page chosen has no content or does not exist.`);
+  //       return;
+  //     }
+
+  //     // Create a new ZIP archive
+  //     const zip = new JSZip();
+
+  //     const frontendFolder = zip.folder('frontend');
+
+  //     // Create a CSS folder
+  //     const cssFolder = frontendFolder.folder('css');
+  //     const backendZipBlob = await generateBackendResponse.blob();
+  //     console.log(backendZipBlob)
+
+  //     zip.file('backend.zip', backendZipBlob);
+
+  //     function createTemplatePlaceholders(html) {
+  //       const userInputPlaceholder = "{{userInputPlaceholder}}";
+  //       const tagPlaceholders = {
+  //         a: true,
+  //         div: true,
+  //         img: true,
+  //         video: true,
+  //         iframe: true,
+  //       };
+
+  //       let template = html;
+  //       let index = 1;
+
+  //       for (const [tag, _] of Object.entries(tagPlaceholders)) {
+  //         const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, "g");
+  //         template = template.replace(regex, (match, startTag, innerText, endTag) => {
+  //           const idMatch = startTag.match(/id="([^"]*)"/);
+  //           // const idAttribute = idMatch ? idMatch[0] : ''; // Keep id attribute if exists
+  //           // const classMatch = startTag.match(/class="([^"]*)"/);
+  //           // const classAttribute = classMatch ? classMatch[0] : ''; // Keep class attribute if exists
+  //           const replacedStartTag = startTag.replace(); // Remove id and class attributes
+  //           return `${replacedStartTag}${userInputPlaceholder}${endTag}`;
+  //         });
+  //         index++;
+  //       }
+
+  //       // Replace src, width, height, and other attributes
+  //       const attributeRegex = /(\w+)=("[^"]*")/g;
+  //       template = template.replace(attributeRegex, (match, attributeName, attributeValue) => {
+  //         console.log(attributeName)
+  //         if (attributeName !== 'id' && attributeName !== 'class' && attributeName !== 'gjs' && attributeName !== 'customId' && attributeName !== 'frameborder') {
+  //           return `${attributeName}=${userInputPlaceholder}`;
+  //         }
+  //         return match;
+  //       });
+
+  //       return template;
+  //     }
+
+  //     // Add the HTML and CSS for each page to the ZIP archive
+  //     validPageData.forEach(({ html, css, assets, pageId, name }) => {
+  //       const html2 = createTemplatePlaceholders(html);
+  //       console.log(html2)
+  //       if (html) {
+
+  //         // Construct HTML content with proper structure
+  //         const htmlContent = `
+  //         <!DOCTYPE html>
+  //         <html lang="en">
+  //         <head>
+  //           <meta charset="UTF-8">
+  //           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  //           <title>${name}</title>
+  //           <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
+  //         </head>
+  //         <body>
+  //           ${html2}
+  //         </body>
+  //         </html>
+  //       `;
+
+  //         console.log(htmlContent)
+
+  //         // Add HTML file to the ZIP archive
+  //         frontendFolder.file(`${name}.html`, htmlContent);
+
+  //         // Add CSS file to the CSS folder with naming convention style_pagename.css
+  //         cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
+
+  //         // Add assets to the ZIP archive
+  //         assets.forEach((asset, index) => {
+  //           const filename = `images/${pageId}_image_${index + 1}.jpg`;
+  //           // Fetch assets and add them to the ZIP
+  //           // Adjust the path as per your server setup
+  //           fetch(asset.src, { mode: 'no-cors' })
+  //             .then(response => response.blob())
+  //             .then(blob => {
+  //               frontendFolder.file(filename, blob);
+  //             })
+  //             .catch(error => console.error('Error fetching asset:', error));
+  //         });
+  //       }
+  //     });
+
+  //     // Generate the ZIP archive
+  //     zip.generateAsync({ type: 'blob' }).then(async (content) => {
+  //       toast.success(`Page successfully exported.`);
+  //       saveAs(content, 'pages.zip');
+  //     });
+
+  //     setSelectedPages([]);
+  //   } catch (error) {
+  //     console.error('Error generating backend and exporting pages:', error);
+  //     toast.error('Error generating backend and exporting pages. Please try again later.');
+  //   }
+  // };
+
   const handleExport = async () => {
     try {
-      const generateBackendResponse = await fetch('http://localhost:8080/api/generateAndSendBackend', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ /* Any necessary parameters */ })
-      });
+      const generateBackendResponse = await fetch(
+        "http://localhost:8080/api/generateAndSendBackend",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            /* Any necessary parameters */
+          }),
+        }
+      );
       if (!generateBackendResponse.ok) {
-        throw new Error('Error generating backend');
+        throw new Error("Error generating backend");
       }
 
       const pageDataPromises = selectedPages.map(async (pageId) => {
         try {
-          const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
-          if (!response.ok) throw new Error('Network response was not ok.');
+          const response = await fetch(
+            `http://localhost:8080/api/pages/${pageId}`
+          );
+          if (!response.ok) throw new Error("Network response was not ok.");
           const data = await response.json();
 
           // Check if data or content is null or empty
-          if (!data || !data.content || !data.content['mycustom-html']) {
+          if (!data || !data.content || !data.content["mycustom-html"]) {
             // Notify user if the page data is null or empty
             toast.error(`Page ${data.name} has no content or does not exist.`);
             return null;
           }
 
           // Clean the HTML string
-          const cleanedHTML = data.content['mycustom-html'];
-          const cleanedCSS = data.content['mycustom-css'];
-          const cleanedComponents = JSON.parse(data.content['mycustom-components']);
-          const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
+          const cleanedHTML = data.content["mycustom-html"];
+          const cleanedCSS = data.content["mycustom-css"];
+          const cleanedComponents = JSON.parse(
+            data.content["mycustom-components"]
+          );
+          const cleanedAssets = JSON.parse(data.content["mycustom-assets"]);
 
-          return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
-
+          return {
+            html: cleanedHTML,
+            css: cleanedCSS,
+            components: cleanedComponents,
+            assets: cleanedAssets,
+            pageId,
+            name: data.name,
+          };
         } catch (error) {
-          console.error('Error fetching page data:', error);
+          console.error("Error fetching page data:", error);
           // Notify user if there's an error fetching page data
-          toast.error('Error fetching page data. Please try again later.');
+          toast.error("Error fetching page data. Please try again later.");
           return null;
         }
       });
@@ -114,7 +287,7 @@ const Home = () => {
       const pageData = await Promise.all(pageDataPromises);
 
       // Filter out null entries before further processing
-      const validPageData = pageData.filter(page => page !== null);
+      const validPageData = pageData.filter((page) => page !== null);
 
       // If no valid page data, return without exporting
       if (validPageData.length === 0) {
@@ -122,16 +295,35 @@ const Home = () => {
         return;
       }
 
-      // Create a new ZIP archive 
+      const zipBlob = await generateBackendResponse.blob();
       const zip = new JSZip();
 
-      const frontendFolder = zip.folder('frontend');
+      const zip2 = await JSZip.loadAsync(zipBlob);
+
+      // Create a new folder called 'backend' if it doesn't exist
+      const backendFolder = zip.folder("backend") || zip.folder();
+
+      const filesToRemove = []; // Store files to remove after iteration
+
+      zip2.forEach((relativePath, file) => {
+        if (!file.dir) {
+          // Move files into the 'backend' folder
+          backendFolder.file(relativePath, file.async("blob"));
+          console.log(relativePath);
+          // Store the original file to remove later
+          filesToRemove.push(relativePath);
+        }
+      });
+
+      // Remove the original files from the zip
+      filesToRemove.forEach((relativePath) => {
+        delete zip.files[relativePath];
+      });
+
+      const frontendFolder = zip.folder("frontend");
 
       // Create a CSS folder
-      const cssFolder = frontendFolder.folder('css');
-      const backendZipBlob = await generateBackendResponse.blob();
-      console.log(backendZipBlob)
-      zip.file('backend.zip', backendZipBlob);
+      const cssFolder = frontendFolder.folder("css");
 
       function createTemplatePlaceholders(html) {
         const userInputPlaceholder = "{{userInputPlaceholder}}";
@@ -148,36 +340,47 @@ const Home = () => {
 
         for (const [tag, _] of Object.entries(tagPlaceholders)) {
           const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, "g");
-          template = template.replace(regex, (match, startTag, innerText, endTag) => {
-            const idMatch = startTag.match(/id="([^"]*)"/);
-            // const idAttribute = idMatch ? idMatch[0] : ''; // Keep id attribute if exists
-            // const classMatch = startTag.match(/class="([^"]*)"/);
-            // const classAttribute = classMatch ? classMatch[0] : ''; // Keep class attribute if exists
-            const replacedStartTag = startTag.replace(); // Remove id and class attributes
-            return `${replacedStartTag}${userInputPlaceholder}${endTag}`;
-          });
+          template = template.replace(
+            regex,
+            (match, startTag, innerText, endTag) => {
+              const idMatch = startTag.match(/id="([^"]*)"/);
+              // const idAttribute = idMatch ? idMatch[0] : ''; // Keep id attribute if exists
+              // const classMatch = startTag.match(/class="([^"]*)"/);
+              // const classAttribute = classMatch ? classMatch[0] : ''; // Keep class attribute if exists
+              const replacedStartTag = startTag.replace(); // Remove id and class attributes
+              return `${replacedStartTag}${userInputPlaceholder}${endTag}`;
+            }
+          );
           index++;
         }
 
         // Replace src, width, height, and other attributes
         const attributeRegex = /(\w+)=("[^"]*")/g;
-        template = template.replace(attributeRegex, (match, attributeName, attributeValue) => {
-          console.log(attributeName)
-          if (attributeName !== 'id' && attributeName !== 'class' && attributeName !== 'gjs' && attributeName !== 'customId' && attributeName !== 'frameborder') {
-            return `${attributeName}=${userInputPlaceholder}`;
+        template = template.replace(
+          attributeRegex,
+          (match, attributeName, attributeValue) => {
+            console.log(attributeName);
+            if (
+              attributeName !== "id" &&
+              attributeName !== "class" &&
+              attributeName !== "gjs" &&
+              attributeName !== "customId" &&
+              attributeName !== "frameborder"
+            ) {
+              return `${attributeName}=${userInputPlaceholder}`;
+            }
+            return match;
           }
-          return match;
-        });
+        );
 
         return template;
       }
 
-      // Add the HTML and CSS for each page to the ZIP archive 
+      // Add the HTML and CSS for each page to the ZIP archive
       validPageData.forEach(({ html, css, assets, pageId, name }) => {
         const html2 = createTemplatePlaceholders(html);
-        console.log(html2)
+        console.log(html2);
         if (html) {
-
           // Construct HTML content with proper structure
           const htmlContent = `
           <!DOCTYPE html>
@@ -186,7 +389,9 @@ const Home = () => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${name}</title>
-            <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
+            <link rel="stylesheet" href="css/style_${name
+              .replace(/\s/g, "_")
+              .toLowerCase()}.css">
           </head>
           <body>
             ${html2}
@@ -194,70 +399,82 @@ const Home = () => {
           </html>
         `;
 
-          console.log(htmlContent)
+          console.log(htmlContent);
 
           // Add HTML file to the ZIP archive
           frontendFolder.file(`${name}.html`, htmlContent);
 
           // Add CSS file to the CSS folder with naming convention style_pagename.css
-          cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
+          cssFolder.file(
+            `style_${name.replace(/\s/g, "_").toLowerCase()}.css`,
+            css
+          );
 
           // Add assets to the ZIP archive
           assets.forEach((asset, index) => {
             const filename = `images/${pageId}_image_${index + 1}.jpg`;
             // Fetch assets and add them to the ZIP
             // Adjust the path as per your server setup
-            fetch(asset.src, { mode: 'no-cors' })
-              .then(response => response.blob())
-              .then(blob => {
+            fetch(asset.src, { mode: "no-cors" })
+              .then((response) => response.blob())
+              .then((blob) => {
                 frontendFolder.file(filename, blob);
               })
-              .catch(error => console.error('Error fetching asset:', error));
+              .catch((error) => console.error("Error fetching asset:", error));
           });
         }
       });
 
-
-
-      // Generate the ZIP archive 
-      zip.generateAsync({ type: 'blob' }).then(async (content) => {
+      // Generate the ZIP archive
+      zip.generateAsync({ type: "blob" }).then(async (content) => {
         toast.success(`Page successfully exported.`);
-        saveAs(content, 'pages.zip');
+        saveAs(content, "pages.zip");
       });
 
       setSelectedPages([]);
     } catch (error) {
-      console.error('Error generating backend and exporting pages:', error);
-      toast.error('Error generating backend and exporting pages. Please try again later.');
+      console.error("Error generating backend and exporting pages:", error);
+      toast.error(
+        "Error generating backend and exporting pages. Please try again later."
+      );
     }
   };
-
 
   const handleExport2 = async () => {
     const pageDataPromises = selectedPages.map(async (pageId) => {
       try {
-        const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
+        const response = await fetch(
+          `http://localhost:8080/api/pages/${pageId}`
+        );
         const data = await response.json();
 
         // Check if data or content is null or empty
-        if (!data || !data.content || !data.content['mycustom-html']) {
+        if (!data || !data.content || !data.content["mycustom-html"]) {
           // Notify user if the page data is null or empty
           toast.error(`Page ${data.name} has no content or does not exist.`);
           return null;
         }
 
         // Clean the HTML string
-        const cleanedHTML = data.content['mycustom-html'];
-        const cleanedCSS = data.content['mycustom-css'];
-        const cleanedComponents = JSON.parse(data.content['mycustom-components']);
-        const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
+        const cleanedHTML = data.content["mycustom-html"];
+        const cleanedCSS = data.content["mycustom-css"];
+        const cleanedComponents = JSON.parse(
+          data.content["mycustom-components"]
+        );
+        const cleanedAssets = JSON.parse(data.content["mycustom-assets"]);
 
-        return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
-
+        return {
+          html: cleanedHTML,
+          css: cleanedCSS,
+          components: cleanedComponents,
+          assets: cleanedAssets,
+          pageId,
+          name: data.name,
+        };
       } catch (error) {
-        console.error('Error fetching page data:', error);
+        console.error("Error fetching page data:", error);
         // Notify user if there's an error fetching page data
-        toast.error('Error fetching page data. Please try again later.');
+        toast.error("Error fetching page data. Please try again later.");
         return null;
       }
     });
@@ -266,7 +483,7 @@ const Home = () => {
     const pageData = await Promise.all(pageDataPromises);
 
     // Filter out null entries before further processing
-    const validPageData = pageData.filter(page => page !== null);
+    const validPageData = pageData.filter((page) => page !== null);
 
     // If no valid page data, return without exporting
     if (validPageData.length === 0) {
@@ -287,7 +504,9 @@ const Home = () => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${name}</title>
-            <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
+            <link rel="stylesheet" href="css/style_${name
+              .replace(/\s/g, "_")
+              .toLowerCase()}.css">
           </head>
           <body>
             ${html}
@@ -295,16 +514,19 @@ const Home = () => {
           </html>
         `;
         filesArray.push({ name: `${name}.html`, content: htmlContent });
-        filesArray.push({ name: `style_${name.replace(/\s/g, '_').toLowerCase()}.css`, content: css });
+        filesArray.push({
+          name: `style_${name.replace(/\s/g, "_").toLowerCase()}.css`,
+          content: css,
+        });
       }
     });
 
     try {
       // Send the HTML and CSS files array to the server using fetch
-      const response = await fetch('http://localhost:8080/api/pages/test', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/api/pages/test", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ files: filesArray }),
       });
@@ -315,31 +537,42 @@ const Home = () => {
         toast.error(`Failed to export page. Status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Error exporting page:', error);
+      console.error("Error exporting page:", error);
       toast.error(`Failed to export page. ${error.message}`);
     }
 
     setSelectedPages([]);
   };
 
-
-
   return (
-    <div style={{ paddingTop: '40px', fontFamily: 'Arial, sans-serif' }}>
-      <div style={{ maxWidth: '800px', margin: 'auto' }}>
+    <div style={{ paddingTop: "40px", fontFamily: "Arial, sans-serif" }}>
+      <div style={{ maxWidth: "800px", margin: "auto" }}>
         <form>
-          <div style={{ background: '#f7f7f7', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <div style={{ padding: '20px', borderBottom: '1px solid #ddd' }}>
+          <div
+            style={{
+              background: "#f7f7f7",
+              borderRadius: "8px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div style={{ padding: "20px", borderBottom: "1px solid #ddd" }}>
               <h5>Create a New Page</h5>
             </div>
-            <div style={{ padding: '20px' }}>
-              <label htmlFor="name" style={{ display: 'block', marginBottom: '10px' }}>Page Name</label>
+            <div style={{ padding: "20px" }}>
+              <label
+                htmlFor="name"
+                style={{ display: "block", marginBottom: "10px" }}
+              >
+                Page Name
+              </label>
               <input
                 type="text"
                 style={{
-                  width: '100%', padding: '10px', borderRadius: '4px',
-                  border: `1px solid ${isValid ? '#ccc' : '#ff4d4f'}`,
-                  boxShadow: `0 0 0 ${isValid ? '0' : '1px'} #ff4d4f inset`
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "4px",
+                  border: `1px solid ${isValid ? "#ccc" : "#ff4d4f"}`,
+                  boxShadow: `0 0 0 ${isValid ? "0" : "1px"} #ff4d4f inset`,
                 }}
                 id="name"
                 placeholder="Enter page name"
@@ -347,22 +580,40 @@ const Home = () => {
                 onChange={(e) => setName(e.target.value)}
               />
               {!isValid && (
-                <div style={{ color: '#ff4d4f', marginTop: '5px' }}>
+                <div style={{ color: "#ff4d4f", marginTop: "5px" }}>
                   Please provide a valid name.
                 </div>
               )}
             </div>
-            <div style={{ padding: '20px', borderTop: '1px solid #ddd', textAlign: 'right' }}>
+            <div
+              style={{
+                padding: "20px",
+                borderTop: "1px solid #ddd",
+                textAlign: "right",
+              }}
+            >
               <button
                 type="button"
-                style={{ padding: '10px 20px', marginRight: '10px', background: '#ccc', border: 'none', borderRadius: '4px' }}
+                style={{
+                  padding: "10px 20px",
+                  marginRight: "10px",
+                  background: "#ccc",
+                  border: "none",
+                  borderRadius: "4px",
+                }}
                 onClick={() => setName("")}
               >
                 Clear
               </button>
               <button
                 type="button"
-                style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+                style={{
+                  padding: "10px 20px",
+                  background: "#007bff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                }}
                 onClick={handleSubmit}
               >
                 Save
@@ -371,11 +622,17 @@ const Home = () => {
           </div>
         </form>
 
-
-        <div style={{ marginTop: '20px' }}>
+        <div style={{ marginTop: "20px" }}>
           <button
             type="button"
-            style={{ padding: '10px 20px', marginRight: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+            style={{
+              padding: "10px 20px",
+              marginRight: "10px",
+              background: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+            }}
             onClick={handleExport}
             disabled={selectedPages.length === 0}
           >
@@ -383,7 +640,13 @@ const Home = () => {
           </button>
           <button
             type="button"
-            style={{ padding: '10px 20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+            style={{
+              padding: "10px 20px",
+              background: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+            }}
             onClick={handleExport2}
             disabled={selectedPages.length === 0} // Disable the button if no pages are selected
           >
@@ -393,38 +656,81 @@ const Home = () => {
             <table className="table table-striped table-hover">
               <thead className="table-dark">
                 <tr>
-                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Select</th>
-                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Name</th>
-                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Slug</th>
-                  <th style={{ padding: '10px', border: '1px solid #ddd' }}>Action</th>
+                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                    Select
+                  </th>
+                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                    Name
+                  </th>
+                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                    Slug
+                  </th>
+                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {pages && pages.length > 0 ? pages.map((page) => (
-                  <tr key={page._id}>
-                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>
-                      <input
-                        type="checkbox"
-                        value={page._id}
-                        checked={selectedPages.includes(page._id)}
-                        onChange={() => handlePageCheckboxChange(page._id)}
-                      />
-                    </td>
-                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>{page._id}</td>
-                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>{page.name}</td>
-                    <td style={{ padding: '10px', border: '1px solid #ddd' }}>
-                      <Link to={`/editor/${page._id}`} style={{ padding: '5px 10px', background: '#17a2b8', color: '#fff', borderRadius: '4px', textDecoration: 'none' }}>Edit</Link>
-                      <button
-                        type="button"
-                        style={{ padding: '5px 10px', marginLeft: '10px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px' }}
-                        onClick={() => confirmDelete(page._id)}
-                      >
-                        Delete
-                      </button>
+                {pages && pages.length > 0 ? (
+                  pages.map((page) => (
+                    <tr key={page._id}>
+                      <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                        <input
+                          type="checkbox"
+                          value={page._id}
+                          checked={selectedPages.includes(page._id)}
+                          onChange={() => handlePageCheckboxChange(page._id)}
+                        />
+                      </td>
+                      <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                        {page._id}
+                      </td>
+                      <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                        {page.name}
+                      </td>
+                      <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                        <Link
+                          to={`/editor/${page._id}`}
+                          style={{
+                            padding: "5px 10px",
+                            background: "#17a2b8",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            textDecoration: "none",
+                          }}
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          type="button"
+                          style={{
+                            padding: "5px 10px",
+                            marginLeft: "10px",
+                            background: "#dc3545",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "4px",
+                          }}
+                          onClick={() => confirmDelete(page._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      style={{
+                        textAlign: "center",
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                      }}
+                    >
+                      No pages found
                     </td>
                   </tr>
-                )) : (
-                  <tr><td colSpan="5" style={{ textAlign: 'center', padding: '10px', border: '1px solid #ddd' }}>No pages found</td></tr>
                 )}
               </tbody>
             </table>
@@ -436,6 +742,3 @@ const Home = () => {
   );
 };
 export default Home;
-
-
-
