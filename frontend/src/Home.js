@@ -69,100 +69,117 @@ const Home = () => {
   };
 
   const handleExport = async () => {
-    const pageDataPromises = selectedPages.map(async (pageId) => {
-      try {
-        const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
-        if (!response.ok) throw new Error('Network response was not ok.');
-        const data = await response.json();
+    try {
+      const generateBackendResponse = await fetch('http://localhost:8080/api/generateAndSendBackend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ /* Any necessary parameters */ })
+      });
+      if (!generateBackendResponse.ok) {
+        throw new Error('Error generating backend');
+      }
 
-        // Check if data or content is null or empty
-        if (!data || !data.content || !data.content['mycustom-html']) {
-          // Notify user if the page data is null or empty
-          toast.error(`Page ${data.name} has no content or does not exist.`);
+      const pageDataPromises = selectedPages.map(async (pageId) => {
+        try {
+          const response = await fetch(`http://localhost:8080/api/pages/${pageId}`);
+          if (!response.ok) throw new Error('Network response was not ok.');
+          const data = await response.json();
+
+          // Check if data or content is null or empty
+          if (!data || !data.content || !data.content['mycustom-html']) {
+            // Notify user if the page data is null or empty
+            toast.error(`Page ${data.name} has no content or does not exist.`);
+            return null;
+          }
+
+          // Clean the HTML string
+          const cleanedHTML = data.content['mycustom-html'];
+          const cleanedCSS = data.content['mycustom-css'];
+          const cleanedComponents = JSON.parse(data.content['mycustom-components']);
+          const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
+
+          return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
+
+        } catch (error) {
+          console.error('Error fetching page data:', error);
+          // Notify user if there's an error fetching page data
+          toast.error('Error fetching page data. Please try again later.');
           return null;
         }
-
-        // Clean the HTML string
-        const cleanedHTML = data.content['mycustom-html'];
-        const cleanedCSS = data.content['mycustom-css'];
-        const cleanedComponents = JSON.parse(data.content['mycustom-components']);
-        const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
-
-        return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
-
-      } catch (error) {
-        console.error('Error fetching page data:', error);
-        // Notify user if there's an error fetching page data
-        toast.error('Error fetching page data. Please try again later.');
-        return null;
-      }
-    });
-
-    // Wait for all page data promises to resolve
-    const pageData = await Promise.all(pageDataPromises);
-
-    // Filter out null entries before further processing
-    const validPageData = pageData.filter(page => page !== null);
-
-    // If no valid page data, return without exporting
-    if (validPageData.length === 0) {
-      toast.error(`Page chosen has no content or does not exist.`);
-      return;
-    }
-
-    // Create a new ZIP archive 
-    const zip = new JSZip();
-
-    // Create a CSS folder
-    const cssFolder = zip.folder('css');
-
-    function createTemplatePlaceholders(html) {
-      const userInputPlaceholder = "{{userInputPlaceholder}}";
-      const tagPlaceholders = {
-        a: true,
-        div: true,
-        img: true,
-        video: true,
-        iframe: true,
-      };
-
-      let template = html;
-      let index = 1;
-
-      for (const [tag, _] of Object.entries(tagPlaceholders)) {
-        const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, "g");
-        template = template.replace(regex, (match, startTag, innerText, endTag) => {
-          const idMatch = startTag.match(/id="([^"]*)"/);
-          const idAttribute = idMatch ? idMatch[0] : ''; // Keep id attribute if exists
-          const classMatch = startTag.match(/class="([^"]*)"/);
-          const classAttribute = classMatch ? classMatch[0] : ''; // Keep class attribute if exists
-          const replacedStartTag = startTag.replace(); // Remove id and class attributes
-          return `${replacedStartTag}${userInputPlaceholder}${endTag}`;
-        });
-        index++;
-      }
-
-      // Replace src, width, height, and other attributes
-      const attributeRegex = /(\w+)=("[^"]*")/g;
-      template = template.replace(attributeRegex, (match, attributeName, attributeValue) => {
-        console.log(attributeName)
-        if (attributeName !== 'id' && attributeName !== 'class' && attributeName !== 'gjs') {
-          return `${attributeName}=${userInputPlaceholder}`;
-        }
-        return match;
       });
 
-      return template;
-    }
+      // Wait for all page data promises to resolve
+      const pageData = await Promise.all(pageDataPromises);
 
-    // Add the HTML and CSS for each page to the ZIP archive 
-    validPageData.forEach(({ html, css, assets, pageId, name }) => {
-      const html2 = createTemplatePlaceholders(html);
-      console.log(html2)
-      if (html) {
-        
-        // Construct HTML content with proper structure
-        const htmlContent = `
+      // Filter out null entries before further processing
+      const validPageData = pageData.filter(page => page !== null);
+
+      // If no valid page data, return without exporting
+      if (validPageData.length === 0) {
+        toast.error(`Page chosen has no content or does not exist.`);
+        return;
+      }
+
+      // Create a new ZIP archive 
+      const zip = new JSZip();
+
+      const frontendFolder = zip.folder('frontend');
+
+      // Create a CSS folder
+      const cssFolder = frontendFolder.folder('css');
+      const backendZipBlob = await generateBackendResponse.blob();
+      console.log(backendZipBlob)
+      zip.file('backend.zip', backendZipBlob);
+
+      function createTemplatePlaceholders(html) {
+        const userInputPlaceholder = "{{userInputPlaceholder}}";
+        const tagPlaceholders = {
+          a: true,
+          div: true,
+          img: true,
+          video: true,
+          iframe: true,
+        };
+
+        let template = html;
+        let index = 1;
+
+        for (const [tag, _] of Object.entries(tagPlaceholders)) {
+          const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, "g");
+          template = template.replace(regex, (match, startTag, innerText, endTag) => {
+            const idMatch = startTag.match(/id="([^"]*)"/);
+            // const idAttribute = idMatch ? idMatch[0] : ''; // Keep id attribute if exists
+            // const classMatch = startTag.match(/class="([^"]*)"/);
+            // const classAttribute = classMatch ? classMatch[0] : ''; // Keep class attribute if exists
+            const replacedStartTag = startTag.replace(); // Remove id and class attributes
+            return `${replacedStartTag}${userInputPlaceholder}${endTag}`;
+          });
+          index++;
+        }
+
+        // Replace src, width, height, and other attributes
+        const attributeRegex = /(\w+)=("[^"]*")/g;
+        template = template.replace(attributeRegex, (match, attributeName, attributeValue) => {
+          console.log(attributeName)
+          if (attributeName !== 'id' && attributeName !== 'class' && attributeName !== 'gjs' && attributeName !== 'customId' && attributeName !== 'frameborder') {
+            return `${attributeName}=${userInputPlaceholder}`;
+          }
+          return match;
+        });
+
+        return template;
+      }
+
+      // Add the HTML and CSS for each page to the ZIP archive 
+      validPageData.forEach(({ html, css, assets, pageId, name }) => {
+        const html2 = createTemplatePlaceholders(html);
+        console.log(html2)
+        if (html) {
+
+          // Construct HTML content with proper structure
+          const htmlContent = `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -177,36 +194,42 @@ const Home = () => {
           </html>
         `;
 
-        // Add HTML file to the ZIP archive
-        zip.file(`${name}.html`, htmlContent);
+          console.log(htmlContent)
 
-        // Add CSS file to the CSS folder with naming convention style_pagename.css
-        cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
+          // Add HTML file to the ZIP archive
+          frontendFolder.file(`${name}.html`, htmlContent);
 
-        // Add assets to the ZIP archive
-        assets.forEach((asset, index) => {
-          const filename = `images/${pageId}_image_${index + 1}.jpg`;
-          // Fetch assets and add them to the ZIP
-          // Adjust the path as per your server setup
-          fetch(asset.src, { mode: 'no-cors' })
-            .then(response => response.blob())
-            .then(blob => {
-              zip.file(filename, blob);
-            })
-            .catch(error => console.error('Error fetching asset:', error));
-        });
-      }
-    });
+          // Add CSS file to the CSS folder with naming convention style_pagename.css
+          cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
+
+          // Add assets to the ZIP archive
+          assets.forEach((asset, index) => {
+            const filename = `images/${pageId}_image_${index + 1}.jpg`;
+            // Fetch assets and add them to the ZIP
+            // Adjust the path as per your server setup
+            fetch(asset.src, { mode: 'no-cors' })
+              .then(response => response.blob())
+              .then(blob => {
+                frontendFolder.file(filename, blob);
+              })
+              .catch(error => console.error('Error fetching asset:', error));
+          });
+        }
+      });
 
 
 
-    // Generate the ZIP archive 
-    zip.generateAsync({ type: 'blob' }).then(async (content) => {
-      toast.success(`Page successfully exported.`);
-      saveAs(content, 'pages.zip');
-    });
+      // Generate the ZIP archive 
+      zip.generateAsync({ type: 'blob' }).then(async (content) => {
+        toast.success(`Page successfully exported.`);
+        saveAs(content, 'pages.zip');
+      });
 
-    setSelectedPages([]);
+      setSelectedPages([]);
+    } catch (error) {
+      console.error('Error generating backend and exporting pages:', error);
+      toast.error('Error generating backend and exporting pages. Please try again later.');
+    }
   };
 
 
@@ -413,3 +436,6 @@ const Home = () => {
   );
 };
 export default Home;
+
+
+
