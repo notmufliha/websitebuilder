@@ -1,4 +1,5 @@
 import { API_HOST } from ".";
+import editor from "./geditor_config"
 
 export const styleManager = {
   appendTo: "#styles-container",
@@ -535,13 +536,27 @@ export const addEditorCommand = (editor) => {
     run: (editor) => editor.UndoManager.redo(),
   });
 
-  editor.Commands.add("export", {
-    run: (editor) => {
-      editor.runCommand("gjs-export-zip")
-      console.log(editor.editor)
-      //  alert(`Select page to export:\n${dropdownHTML}`);
+  // editor.Commands.add("export", {
+  //   run: (editor) => {
+  //     editor.runCommand("gjs-export-zip")
+  //     console.log(editor)
+  //     //  alert(`Select page to export:\n${dropdownHTML}`);
+  //   }
+  // });
+
+  editor.Commands.add('export', {
+    run: function (editor) {
+      console.log('Export command triggered');
+      if (editor) {
+        console.log('Editor instance is valid');
+        editor.runCommand('gjs-export-zip');
+      } else {
+        console.log('Editor instance is not valid');
+      }
     }
   });
+
+
   editor.Commands.add("new-tool-cmd", {
     run: (editor) => console.log("Checking New Toolbar"),
   });

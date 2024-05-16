@@ -38,8 +38,6 @@ const Home = () => {
     }
   };
 
-
-
   const confirmDelete = async (pageId) => {
     if (window.confirm("Are you sure you want to delete this page?")) {
       handleDelete(pageId);
@@ -58,8 +56,6 @@ const Home = () => {
     }
   };
 
-
-
   const handlePageCheckboxChange = (pageId) => {
     if (selectedPages.includes(pageId)) {
       setSelectedPages(selectedPages.filter((id) => id !== pageId));
@@ -75,46 +71,54 @@ const Home = () => {
         if (!response.ok) throw new Error('Network response was not ok.');
         const data = await response.json();
 
-        // Check if data or content is null or empty
         if (!data || !data.content || !data.content['mycustom-html']) {
-          // Notify user if the page data is null or empty
           toast.error(`Page ${data.name} has no content or does not exist.`);
           return null;
         }
 
-        // Clean the HTML string
         const cleanedHTML = data.content['mycustom-html'];
         const cleanedCSS = data.content['mycustom-css'];
         const cleanedComponents = JSON.parse(data.content['mycustom-components']);
         const cleanedAssets = JSON.parse(data.content['mycustom-assets']);
 
-        return { html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name };
+        const componentsResponse = await fetch(`http://localhost:8080/api/pages/${pageId}/components`);
+        if (!componentsResponse.ok) throw new Error('Failed to fetch components.');
+        const componentsData = await componentsResponse.json();
+
+        await fetch('http://localhost:8080/api/pages/components', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pageId, components: componentsData.components })
+        });
+
+        const sqlResponse = await fetch(`http://localhost:8080/api/pages/${pageId}/sqldump`);
+        if (!sqlResponse.ok) throw new Error('Failed to fetch SQL dump.');
+        const sqlBlob = await sqlResponse.blob();
+
+        return {
+          html: cleanedHTML, css: cleanedCSS, components: cleanedComponents, assets: cleanedAssets, pageId, name: data.name, sqlBlob
+        };
 
       } catch (error) {
         console.error('Error fetching page data:', error);
-        // Notify user if there's an error fetching page data
         toast.error('Error fetching page data. Please try again later.');
         return null;
       }
     });
 
-    // Wait for all page data promises to resolve
     const pageData = await Promise.all(pageDataPromises);
-
-    // Filter out null entries before further processing
     const validPageData = pageData.filter(page => page !== null);
 
-    // If no valid page data, return without exporting
     if (validPageData.length === 0) {
       toast.error(`Page chosen has no content or does not exist.`);
       return;
     }
 
-    // Create a new ZIP archive 
     const zip = new JSZip();
-
-    // Create a CSS folder
     const cssFolder = zip.folder('css');
+    const sqlFolder = zip.folder('sql');
+
+    validPageData.forEach(({ html, css, assets, pageId, name, sqlBlob }) => {
 
     function createTemplatePlaceholders(html) {
       const userInputPlaceholder = "{{userInputPlaceholder}}";
@@ -154,14 +158,13 @@ const Home = () => {
 
       return template;
     }
+    const sqlFolder = zip.folder('sql');
 
-    // Add the HTML and CSS for each page to the ZIP archive 
-    validPageData.forEach(({ html, css, assets, pageId, name }) => {
+    validPageData.forEach(({ html, css, assets, pageId, name, sqlBlob }) => {
+
       const html2 = createTemplatePlaceholders(html);
       console.log(html2)
       if (html) {
-        
-        // Construct HTML content with proper structure
         const htmlContent = `
           <!DOCTYPE html>
           <html lang="en">
@@ -171,23 +174,17 @@ const Home = () => {
             <title>${name}</title>
             <link rel="stylesheet" href="css/style_${name.replace(/\s/g, '_').toLowerCase()}.css">
           </head>
-          <body>
-            ${html2}
-          </body>
+          <body>${html2}</body>
           </html>
         `;
 
-        // Add HTML file to the ZIP archive
         zip.file(`${name}.html`, htmlContent);
-
-        // Add CSS file to the CSS folder with naming convention style_pagename.css
         cssFolder.file(`style_${name.replace(/\s/g, '_').toLowerCase()}.css`, css);
+        console.log(`HTML and CSS files created for page ${pageId}`);
 
-        // Add assets to the ZIP archive
+
         assets.forEach((asset, index) => {
           const filename = `images/${pageId}_image_${index + 1}.jpg`;
-          // Fetch assets and add them to the ZIP
-          // Adjust the path as per your server setup
           fetch(asset.src, { mode: 'no-cors' })
             .then(response => response.blob())
             .then(blob => {
@@ -195,12 +192,11 @@ const Home = () => {
             })
             .catch(error => console.error('Error fetching asset:', error));
         });
+
+        sqlFolder.file(`${pageId}.sql`, sqlBlob); // Add the SQL dump to the ZIP
       }
     });
 
-
-
-    // Generate the ZIP archive 
     zip.generateAsync({ type: 'blob' }).then(async (content) => {
       toast.success(`Page successfully exported.`);
       saveAs(content, 'pages.zip');
@@ -208,7 +204,6 @@ const Home = () => {
 
     setSelectedPages([]);
   };
-
 
   const handleExport2 = async () => {
     const pageDataPromises = selectedPages.map(async (pageId) => {
@@ -298,8 +293,6 @@ const Home = () => {
 
     setSelectedPages([]);
   };
-
-
 
   return (
     <div style={{ paddingTop: '40px', fontFamily: 'Arial, sans-serif' }}>

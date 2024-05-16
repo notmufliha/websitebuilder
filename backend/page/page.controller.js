@@ -6,6 +6,7 @@ import {
   savePageContent,
   updatePage,
 } from './page.services';
+import * as PageServices from './page.services';
 
 export const create = async (req, res) => {
   const pageBody = req.body;
@@ -42,4 +43,15 @@ export const loadContent = async (req, res) => {
   res.header('Content-Type', 'application/json');
   const pageData = await pageDetails(pageId);
   res.json(pageData.content);
+};
+
+export const getComponentsByPageId = async (req, res) => {
+  try {
+    const { pageId } = req.params;
+    const components = await PageServices.getPageComponents(pageId);
+    res.json({ success: true, components });
+  } catch (error) {
+    console.error('Error retrieving components:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
