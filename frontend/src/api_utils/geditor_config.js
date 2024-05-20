@@ -24,6 +24,68 @@ import swiperComponent from "../plugins/swiper";
 import gjsnavbar from "../plugins/navbar";
 import chartLibComponent from "../plugins/charts";
 
+function loadLastIdCounters() {
+  const storedCounters = localStorage.getItem('idCounters');
+  return storedCounters ? JSON.parse(storedCounters) : { text: 100, image: 100, video: 100 };
+}
+
+function saveIdCounters(counters) {
+  localStorage.setItem('idCounters', JSON.stringify(counters));
+}
+
+let idCounters = loadLastIdCounters();
+
+function generateCustomId(type) {
+  let prefix = 'component_';  // Default prefix
+  switch (type.toLowerCase()) {
+    case 'text':
+      prefix = 'textfield_';
+      break;
+    case 'bs-image':
+      prefix = 'img_';
+      break;
+    case 'image':
+      prefix = 'img_';
+      break;
+    case 'video':
+      prefix = 'video_';
+      break;
+    case 'bs-video':
+      prefix = 'video_';
+      break;
+    case 'link':
+      prefix = 'link_';
+      break;
+    case 'column':
+      prefix = 'col_';
+      break;
+    case 'row':
+      prefix = 'row_';
+      break;
+    case 'header':
+      prefix = 'header_';
+      break;
+    case 'paragraph':
+      prefix = 'paragraph_';
+      break;
+    default:
+      prefix = 'component_';
+      console.warn(`Unhandled component type: ${type}, using default prefix`);
+  }
+
+  if (idCounters[type] === undefined) {
+    idCounters[type] = 100;
+  }
+
+  const newId = prefix + idCounters[type];
+  idCounters[type]++;
+  saveIdCounters(idCounters);
+
+  console.log(`Generated ID for type ${type}: ${newId}`);
+  return newId;
+}
+
+
 const geditorConfig = (pageId, assets) => {
   console.log('Starting geditorConfig...');
   $(".panel__devices").html("");
@@ -133,6 +195,33 @@ const geditorConfig = (pageId, assets) => {
     },
   });
 
+  editor.on('component:add', (component) => {
+    const type = component.get('type');
+    const customId = generateCustomId(type);
+    component.addAttributes({ customId: customId });
+    console.log(`Component of type ${type} added with custom ID set to ${customId}`);
+    console.log(`Post-set verification, Custom ID on component: ${component.getAttributes().customId}`);
+  });
+
+  editor.on('export:start', () => {
+
+    console.log("Export started");
+    editor.getComponents().each(component => {
+      component.addAttributes({ id: component.getId() });
+    });
+
+    console.log(editor.getHtml());
+    editor.getComponents().each(component => {
+      console.log(`Component HTML: ${component.toHTML()}`);
+    });
+  });
+
+
+  editor.on('export:complete', () => {
+    console.log('Export completed.');
+  });
+
+
   editor.on('asset:remove', (asset) => {
     // Log the entire asset object to see all available properties
     console.log('Asset to remove:', asset);
@@ -161,7 +250,7 @@ const geditorConfig = (pageId, assets) => {
   });
 
 
-  addEditorCommand(editor);
+  // addEditorCommand(editor);
   editor.on("run:preview", () => {
     console.log("It will trigger when we click on preview icon");
     // This will be used to hide border
@@ -217,6 +306,7 @@ const geditorConfig = (pageId, assets) => {
     category: 'Media',
   });
 
+  addEditorCommand(editor);
 
   setTimeout(() => {
     let categories = editor.BlockManager.getCategories();

@@ -9,6 +9,7 @@ import {
   list,
   loadContent,
 } from './page.controller';
+import { getPageComponents, insertComponentAndAttributes, fetchPageDataAsSqlDump } from './page.services';
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('ssh2');
@@ -153,4 +154,60 @@ pageRoute.get('/:pageId', details);
 pageRoute.get('/', list);
 pageRoute.get('/:pageId/content', loadContent);
 
+pageRoute.get('/:pageId/components', async (req, res) => {
+  try {
+    const { pageId } = req.params;
+    const components = await getPageComponents(pageId);
+
+    res.json({
+      pageId: pageId,
+      components: components
+    });
+  } catch (error) {
+    console.error('Error retrieving components:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+pageRoute.post('/components', async (req, res) => {
+  const { pageId, components } = req.body;
+
+  console.log('{routes} Processing POST request to /components with pageId:', pageId);
+
+  if (!components || components.length === 0) {
+    console.error('{routes} No components provided in the request');
+    return res.status(400).send({ message: "No components provided" });
+  }
+
+  try {
+    console.log('{routes} Initiating the insertion of components. Total components:', components.length);
+
+    components.forEach(component => {
+      console.log('{routes} Inserting component with details:', component);
+      insertComponentAndAttributes(component, pageId);
+    });
+
+    console.log('{routes} All component insertions initiated successfully');
+    res.send({ message: "Components are being processed" });
+  } catch (error) {
+    console.error('{routes} Error during component insertion:', error);
+    res.status(500).send({ message: "Error processing components" });
+  }
+});
+
+// Route to export page data as SQL dump
+pageRoute.get('/:pageId/sqldump', async (req, res) => {
+  const { pageId } = req.params;
+  try {
+    const filePath = await fetchPageDataAsSqlDump(pageId);
+    res.download(filePath, `${pageId}.sql`, (err) => {
+      if (err) {
+        console.error('Error sending the file:', err);
+        res.status(500).send('Error downloading the file.');
+      }
+    });
+  } catch (error) {
+    res.status(500).send('Error generating SQL dump.');
+  }
+});
 export default pageRoute;
