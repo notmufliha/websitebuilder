@@ -3,12 +3,14 @@
 const model = require('../model/model.js');
 
 exports.getAllPages = (req, res) => {
-    model.getAllPages((error, results) => {
+    const pageId = req.params.page_id;
+    model.getAllPages(pageId, (error, results) => {
         if (error) {
-            res.status(500).json({ error: 'Internal Server Error' });
+            console.error('Error fetching pages:', error);
+            res.status(500).json({ error: 'Error fetching pages' });
             return;
         }
-        res.status(200).json(results);
+        res.json(results);
     });
 };
 

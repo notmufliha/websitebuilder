@@ -155,7 +155,14 @@ function addImportStatement(appJsContent, imports) {
 
   return modifiedContent;
 }
-
+app.get(
+  '/api/pages/sql/:page_id',
+  (req, res, next) => {
+    console.log('Accessing /api/pages/sql');
+    next();
+  },
+  controller.getAllPages
+);
 
 
 
@@ -216,14 +223,7 @@ app.get(
   },
   renderHtml,
 );
-app.use(
-  '/api/pages/sql',
-  (req, res, next) => {
-    console.log('Accessing /api/pages/sql');
-    next();
-  },
-  controller.getAllPages,
-);
+
 
 
 const PORT = process.env.APP_PORT || 8080;

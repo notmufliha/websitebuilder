@@ -490,8 +490,81 @@ const Home = () => {
       toast.error(`Page chosen has no content or does not exist.`);
       return;
     }
+    const pageId = selectedPages[0]; 
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/pages/sql/1`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch page data: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Page data:', data);
+      // Process data as needed
+    } catch (error) {
+      console.error('Error fetching page data:', error);
+    }
+
+
 
     const filesArray = [];
+    const content2 = `
+#!/bin/bash
+
+# Function to check if MySQL is installed
+check_mysql_installed() {
+    mysql --version >/dev/null 2>&1
+    return $?
+}
+
+# Function to install MySQL
+install_mysql() {
+    sudo apt-get update
+    sudo apt-get install mysql-server -y
+}
+
+# Function to create a MySQL table
+create_table() {
+    read -p "Enter MySQL root password (leave empty if none): " mysql_password
+
+    # Login to MySQL and create a database and table
+    if [ -z "$mysql_password" ]; then
+        mysql -u root <<\`EOF\`
+CREATE DATABASE IF NOT EXISTS test_db;
+USE test_db;
+CREATE TABLE IF NOT EXISTS test_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255)
+);
+\`EOF\`
+    else
+        mysql -u root -p"\$mysql_password" <<\`EOF\`
+CREATE DATABASE IF NOT EXISTS test_db;
+USE test_db;
+CREATE TABLE IF NOT EXISTS test_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255)
+);
+\`EOF\`
+    fi
+}
+
+# Main function
+main() {
+    if check_mysql_installed; then
+        echo "MySQL is already installed."
+    else
+        echo "MySQL is not installed. Installing..."
+        install_mysql
+    fi
+
+    create_table
+}
+
+main
+`;
+
+
+    filesArray.push({ name: `mysql_setup.sh`, content: content2 });
 
     // Add HTML and CSS files to the filesArray
     validPageData.forEach(({ html, css, name }) => {
@@ -505,8 +578,8 @@ const Home = () => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${name}</title>
             <link rel="stylesheet" href="css/style_${name
-              .replace(/\s/g, "_")
-              .toLowerCase()}.css">
+            .replace(/\s/g, "_")
+            .toLowerCase()}.css">
           </head>
           <body>
             ${html}
