@@ -152,6 +152,7 @@ export const insertComponentAndAttributes = (component, pageId) => {
     )
   }
 }
+
 // Ensure the dumps directory exists
 const ensureDirectoryExistence = filePath => {
   const dirname = path.dirname(filePath)
