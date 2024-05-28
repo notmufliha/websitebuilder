@@ -4,6 +4,8 @@ import $ from "jquery";
 import grapesjsBlockBootstrap from "grapesjs-blocks-bootstrap4";
 import grapesjsPluginExport from "grapesjs-plugin-export";
 import grapesjsStyleBg from "grapesjs-style-bg";
+import customCodePlugin from "grapesjs-custom-code";
+
 import { API_HOST } from ".";
 import axios from "axios";
 import {
@@ -25,51 +27,53 @@ import gjsnavbar from "../plugins/navbar";
 import chartLibComponent from "../plugins/charts";
 
 function loadLastIdCounters() {
-  const storedCounters = localStorage.getItem('idCounters');
-  return storedCounters ? JSON.parse(storedCounters) : { text: 100, image: 100, video: 100 };
+  const storedCounters = localStorage.getItem("idCounters");
+  return storedCounters
+    ? JSON.parse(storedCounters)
+    : { text: 100, image: 100, video: 100 };
 }
 
 function saveIdCounters(counters) {
-  localStorage.setItem('idCounters', JSON.stringify(counters));
+  localStorage.setItem("idCounters", JSON.stringify(counters));
 }
 
 let idCounters = loadLastIdCounters();
 
 function generateCustomId(type) {
-  let prefix = 'component_';  // Default prefix
+  let prefix = "component_"; // Default prefix
   switch (type.toLowerCase()) {
-    case 'text':
-      prefix = 'textfield_';
+    case "text":
+      prefix = "textfield_";
       break;
-    case 'bs-image':
-      prefix = 'img_';
+    case "bs-image":
+      prefix = "img_";
       break;
-    case 'image':
-      prefix = 'img_';
+    case "image":
+      prefix = "img_";
       break;
-    case 'video':
-      prefix = 'video_';
+    case "video":
+      prefix = "video_";
       break;
-    case 'bs-video':
-      prefix = 'video_';
+    case "bs-video":
+      prefix = "video_";
       break;
-    case 'link':
-      prefix = 'link_';
+    case "link":
+      prefix = "link_";
       break;
-    case 'column':
-      prefix = 'col_';
+    case "column":
+      prefix = "col_";
       break;
-    case 'row':
-      prefix = 'row_';
+    case "row":
+      prefix = "row_";
       break;
-    case 'header':
-      prefix = 'header_';
+    case "header":
+      prefix = "header_";
       break;
-    case 'paragraph':
-      prefix = 'paragraph_';
+    case "paragraph":
+      prefix = "paragraph_";
       break;
     default:
-      prefix = 'component_';
+      prefix = "component_";
       console.warn(`Unhandled component type: ${type}, using default prefix`);
   }
 
@@ -85,9 +89,8 @@ function generateCustomId(type) {
   return newId;
 }
 
-
 const geditorConfig = (pageId, assets) => {
-  console.log('Starting geditorConfig...');
+  console.log("Starting geditorConfig...");
   $(".panel__devices").html("");
   $(".panel__basic-actions").html("");
   $(".panel__editor").html("");
@@ -115,57 +118,56 @@ const geditorConfig = (pageId, assets) => {
 
     assetManager: {
       assets: assets,
-      upload: `${API_HOST}uploads`, // Endpoint for uploading files 
-      uploadName: 'myImage', // Name of the POST parameter to pass files
+      upload: `${API_HOST}uploads`, // Endpoint for uploading files
+      uploadName: "myImage", // Name of the POST parameter to pass files
       uploadFile: function (e) {
-        console.log('uploadFile triggered'); // Check if function is triggered
+        console.log("uploadFile triggered"); // Check if function is triggered
 
         // Check if event is triggered with correct data
         if (e.dataTransfer) {
-          console.log('Files dropped', e.dataTransfer.files);
+          console.log("Files dropped", e.dataTransfer.files);
         } else if (e.target) {
-          console.log('Files selected', e.target.files);
+          console.log("Files selected", e.target.files);
         }
 
         var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
         // Check if files are found
-        console.log('Files array', files);
+        console.log("Files array", files);
 
         if (files.length > 0) {
           var file = files[0]; // Only take the first file
-          console.log('Uploading file:', file.name); // Log the file name being uploaded
+          console.log("Uploading file:", file.name); // Log the file name being uploaded
 
           // Create a FormData object
           var formData = new FormData();
-          formData.append('myImage', file);
+          formData.append("myImage", file);
 
           // Send the request
           $.ajax({
             url: `${API_HOST}uploads`,
-            type: 'POST',
+            type: "POST",
             data: formData,
             contentType: false,
-            dataType: 'json',
+            dataType: "json",
             mimeType: "multipart/form-data",
             processData: false,
             success: function (result) {
-              console.log('Upload successful, server result:', result);
+              console.log("Upload successful, server result:", result);
               // Assuming result contains the path to the image, e.g., result.imageUrl
               // Add the uploaded image to the assets in the GrapesJS Asset Manager
               editor.AssetManager.add({
                 id: result.file._id,
                 src: result.imageUrl,
-                name: result.file.fileName
+                name: result.file.fileName,
               });
             },
             error: function (xhr, status, err) {
-              console.error('Upload error: ', status, err);
+              console.error("Upload error: ", status, err);
             },
           });
-
         }
       },
-      uploadText: 'Drop files here or click to upload',
+      uploadText: "Drop files here or click to upload",
     },
 
     storageManager: storageSetting(pageId),
@@ -182,6 +184,7 @@ const geditorConfig = (pageId, assets) => {
       grapesjsPluginExport,
       grapesjsStyleBg,
       chartLibComponent,
+      customCodePlugin,
     ],
     pluginsOpts: {
       tailwindComponent: {},
@@ -192,63 +195,67 @@ const geditorConfig = (pageId, assets) => {
       grapesjsPluginExport: {},
       grapesjsStyleBg: {},
       chartLibComponent: {},
+      [customCodePlugin]: {},
     },
   });
 
-  editor.on('component:add', (component) => {
-    const type = component.get('type');
+  editor.on("component:add", (component) => {
+    const type = component.get("type");
     const customId = generateCustomId(type);
     component.addAttributes({ customId: customId });
-    console.log(`Component of type ${type} added with custom ID set to ${customId}`);
-    console.log(`Post-set verification, Custom ID on component: ${component.getAttributes().customId}`);
+    console.log(
+      `Component of type ${type} added with custom ID set to ${customId}`
+    );
+    console.log(
+      `Post-set verification, Custom ID on component: ${
+        component.getAttributes().customId
+      }`
+    );
   });
 
-  editor.on('export:start', () => {
-
+  editor.on("export:start", () => {
     console.log("Export started");
-    editor.getComponents().each(component => {
+    editor.getComponents().each((component) => {
       component.addAttributes({ id: component.getId() });
     });
 
     console.log(editor.getHtml());
-    editor.getComponents().each(component => {
+    editor.getComponents().each((component) => {
       console.log(`Component HTML: ${component.toHTML()}`);
     });
   });
 
-
-  editor.on('export:complete', () => {
-    console.log('Export completed.');
+  editor.on("export:complete", () => {
+    console.log("Export completed.");
   });
 
-
-  editor.on('asset:remove', (asset) => {
+  editor.on("asset:remove", (asset) => {
     // Log the entire asset object to see all available properties
-    console.log('Asset to remove:', asset);
+    console.log("Asset to remove:", asset);
 
     // Get the asset ID
-    const assetId = asset.get('id'); // Ensure 'id' is the correct property name that holds the unique identifier for the asset
-    console.log('Asset ID to remove:', assetId);
+    const assetId = asset.get("id"); // Ensure 'id' is the correct property name that holds the unique identifier for the asset
+    console.log("Asset ID to remove:", assetId);
 
     if (!assetId) {
-      console.error('No asset ID found, asset removal aborted.');
+      console.error("No asset ID found, asset removal aborted.");
       return; // Stop further execution if assetId is not found
     }
 
     // Construct the URL for the DELETE request
     const url = `${API_HOST}uploads/${assetId}`;
-    console.log('DELETE request URL:', url);
+    console.log("DELETE request URL:", url);
 
     // Call the backend endpoint to delete the asset
-    axios.delete(url)
-      .then(response => {
-        console.log('Image deleted successfully:', response.data);
+    axios
+      .delete(url)
+      .then((response) => {
+        console.log("Image deleted successfully:", response.data);
       })
-      .catch(error => {
-        console.error('Failed to delete image:', error);
+      .catch((error) => {
+        console.error("Failed to delete image:", error);
       });
   });
-
 
   // addEditorCommand(editor);
   editor.on("run:preview", () => {
@@ -293,17 +300,17 @@ const geditorConfig = (pageId, assets) => {
     }
   });
 
-  editor.BlockManager.add('youtube-video', {
-    label: 'YouTube',
+  editor.BlockManager.add("youtube-video", {
+    label: "YouTube",
     content: {
-      type: 'video',
+      type: "video",
       // src: 'https://www.youtube.com/watch?v=C4EGWQe4FJM',
       style: {
-        height: '280px',
-        width: '500px'
-      }
+        height: "280px",
+        width: "500px",
+      },
     },
-    category: 'Media',
+    category: "Media",
   });
 
   addEditorCommand(editor);
