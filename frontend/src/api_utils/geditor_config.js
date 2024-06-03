@@ -4,8 +4,6 @@ import $ from "jquery";
 import grapesjsBlockBootstrap from "grapesjs-blocks-bootstrap4";
 import grapesjsPluginExport from "grapesjs-plugin-export";
 import grapesjsStyleBg from "grapesjs-style-bg";
-import customCodePlugin from "grapesjs-custom-code";
-
 import { API_HOST } from ".";
 import axios from "axios";
 import {
