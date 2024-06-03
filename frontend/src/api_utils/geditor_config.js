@@ -25,6 +25,9 @@ import tailwindComponent from "../plugins/tailwind";
 import swiperComponent from "../plugins/swiper";
 import gjsnavbar from "../plugins/navbar";
 import chartLibComponent from "../plugins/charts";
+import swiperComponent2 from "../plugins/template";
+import customCodePlugin from 'grapesjs-custom-code';
+import sliderComponent from "../plugins/slider";
 
 function loadLastIdCounters() {
   const storedCounters = localStorage.getItem("idCounters");
@@ -40,7 +43,8 @@ function saveIdCounters(counters) {
 let idCounters = loadLastIdCounters();
 
 function generateCustomId(type) {
-  let prefix = "component_"; // Default prefix
+  console.log(type)
+  let prefix = 'component_';  // Default prefix
   switch (type.toLowerCase()) {
     case "text":
       prefix = "textfield_";
@@ -184,7 +188,9 @@ const geditorConfig = (pageId, assets) => {
       grapesjsPluginExport,
       grapesjsStyleBg,
       chartLibComponent,
-      customCodePlugin,
+      swiperComponent2,
+      sliderComponent,
+      customCodePlugin
     ],
     pluginsOpts: {
       tailwindComponent: {},
@@ -195,7 +201,9 @@ const geditorConfig = (pageId, assets) => {
       grapesjsPluginExport: {},
       grapesjsStyleBg: {},
       chartLibComponent: {},
-      [customCodePlugin]: {},
+      swiperComponent2: {},
+      sliderComponent: {},
+      [customCodePlugin]: {}
     },
   });
 

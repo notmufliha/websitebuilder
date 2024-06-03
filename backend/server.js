@@ -8,8 +8,10 @@ import assetRoute from './assets/assets.route';
 import projectRoute from './project/project.route';
 import renderHtml from './render/render.controller';
 import uploadRoute from './uploads/upload.route';
+
 const controller = require('./controller/postsController');
 const os = require('os');
+const http = require('http');
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
 const fs = require('fs');
@@ -30,6 +32,34 @@ app.use('/resources', express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
+
+app.get('/fetch-data', async (req, res) => {
+  try {
+    const url = 'http://raw.githubusercontent.com/notmufliha/websiteC/main/freebies/space/index.html';
+
+    // Make a GET request to the external URL
+    http.get(url, (response) => {
+      let data = '';
+
+      // Concatenate the chunks of data
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      // Send the concatenated data when the response ends
+      response.on('end', () => {
+        res.send(data);
+      });
+    }).on('error', (error) => {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 const mongoUri =
   'mongodb+srv://dariuschew1050:e0Lw6qNiRBs5wYqF@webpagebuilder.kvkmygy.mongodb.net/?retryWrites=true&w=majority&appName=webpagebuilder';
 mongoose.connect(
@@ -48,6 +78,8 @@ mongoose.connect(
     console.log('Connected to MongoDB');
   },
 );
+
+
 
 app.post('/api/generateAndSendBackend', async (req, res) => {
   try {

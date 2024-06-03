@@ -23,6 +23,7 @@
     "grapesjs-style-bg": "^1.0.5",
     "jquery": "^3.6.0",
     "jszip": "^3.10.1",
+    "node-fetch": "^2.7.0",
     "path": "^0.12.7",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-rc.1",
