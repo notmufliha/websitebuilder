@@ -32,6 +32,7 @@ const Editor = () => {
             src: asset.url, // Assuming 'url' is the key that contains the asset URL
             // Add other properties if necessary
           }));
+          console.log(assets)
           if (editor) {
             editor.AssetManager.add(assets);
           }

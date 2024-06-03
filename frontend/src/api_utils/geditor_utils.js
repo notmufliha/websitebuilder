@@ -563,9 +563,11 @@ export const addEditorCommand = (editor) => {
 };
 
 export const storageSetting = (pageId) => {
+  
+
   return {
     type: "remote",
-    stepsBeforeSave: 3,
+    stepsBeforeSave: 1,
     contentTypeJson: true,
     storeComponents: true,
     storeStyles: true,
@@ -576,9 +578,10 @@ export const storageSetting = (pageId) => {
     },
     id: "mycustom-",
     urlStore: `${API_HOST}pages/${pageId}/content`,
-    urlLoad: `${API_HOST}pages/${pageId}/content`,
+    urlLoad:`${API_HOST}pages/${pageId}/content`,
   };
 };
+
 
 export const scripts = [
   "https://code.jquery.com/jquery-3.5.1.slim.min.js",
