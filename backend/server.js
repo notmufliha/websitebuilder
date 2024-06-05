@@ -35,6 +35,10 @@ app.use('/resources', express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'hbs')
 
+app.get('/data', (req, res) => {
+  res.sendFile(__dirname + '/data.txt');
+});
+
 app.get('/fetch-data', async (req, res) => {
   try {
     const url =
