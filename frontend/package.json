@@ -13,6 +13,7 @@
     "bootstrap": "^5.1.1",
     "chart.js": "^3.8.2",
     "cheerio": "^1.0.0-rc.10",
+    "env": "^0.0.2",
     "file-saver": "^2.0.5",
     "flatpickr": "^4.6.13",
     "fs": "^0.0.1-security",
