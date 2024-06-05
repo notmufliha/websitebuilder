@@ -108,7 +108,12 @@ const geditorConfig = (pageId, assets) => {
   const panelTopBar = $('#main-content > .navbar-light')
 
   const editor = grapesjs.init({
+<<<<<<< Updated upstream
     container: '#editor',
+=======
+    allowScripts: 1,
+    container: "#editor",
+>>>>>>> Stashed changes
     blockManager: {
       appendTo: '#blocks'
     },

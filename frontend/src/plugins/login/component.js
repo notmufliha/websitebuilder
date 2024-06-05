@@ -1,89 +1,219 @@
 export default (editor, opts = {}) => {
-    const domc = editor.DomComponents;
+  const domc = editor.DomComponents;
 
-    domc.addType('login-form-component', {
-        isComponent: el => el.tagName === 'FORM' && el.classList.contains('search-form'),
-        model: {
-            defaults: {
-                tagName: 'form',
-                classes: ['search-form'],
+  domc.addType("login-form-component", {
+    isComponent: (el) =>
+      el.tagName === "FORM" && el.classList.contains("search-form"),
+    model: {
+      defaults: {
+        tagName: "div",
+        attributes: { class: "divstudent" },
+        components: [
+          {
+            tagName: "link",
+            attributes: {
+              rel: "stylesheet",
+              href: "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css",
+            },
+          },
+          {
+            tagName: "script",
+            attributes: {
+              src: "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js",
+            },
+          },
+          {
+            tagName: "script",
+            attributes: {
+              src: "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js",
+            },
+          },
+          {
+            tagName: "script",
+            content: `$(document).ready(function () {
+              $("#select1, #select2").select2();
+            });`,
+          },
+          {
+            tagName: "form",
+            classes: ["search-form"],
+            components: [
+              {
+                tagName: "div",
+                classes: ["form-row"],
                 components: [
-                    {
-                        tagName: 'div',
-                        classes: ['form-row'],
-                        components: [
-                            {
-                                tagName: 'select',
-                                attributes: { name: 'from' },
-                                style: { 'width': '150px', 'margin-right': '10px' },
-                                components: [
-                                    { tagName: 'input', attributes: { value: '' }, components: 'From' },
-                                    { tagName: 'option', attributes: { value: '' }, components: 'From' },
-                                    { tagName: 'option', attributes: { value: 'NYC' }, components: 'New York' },
-                                    { tagName: 'option', attributes: { value: 'LAX' }, components: 'Los Angeles' },
-                                ],
-                            },
-                            {
-                                tagName: 'select',
-                                attributes: { name: 'to' },
-                                style: { 'width': '150px', 'margin-right': '10px' },
-                                components: [
-                                    { tagName: 'option', attributes: { value: '' }, components: 'To' },
-                                    { tagName: 'option', attributes: { value: 'NYC' }, components: 'New York' },
-                                    { tagName: 'option', attributes: { value: 'LAX' }, components: 'Los Angeles' },
-                                ],
-                            },
-                            {
-                                tagName: 'input',
-                                attributes: { type: 'date', name: 'departure' },
-                                style: { 'width': '150px', 'margin-right': '10px' },
-                            },
-                            {
-                                tagName: 'input',
-                                attributes: { type: 'date', name: 'arrival' },
-                                style: { 'width': '150px', 'margin-right': '10px' },
-                            },
-                            {
-                                tagName: 'select',
-                                attributes: { name: 'pax' },
-                                style: { 'width': '150px', 'margin-right': '10px' },
-                                components: [
-                                    { tagName: 'option', attributes: { value: '1' }, components: '1' },
-                                    { tagName: 'option', attributes: { value: '2' }, components: '2' },
-                                    { tagName: 'option', attributes: { value: '3' }, components: '3' },
-                                    { tagName: 'option', attributes: { value: '4' }, components: '4' },
-                                ],
-                            },
-                            {
-                                tagName: 'button',
-                                type: 'submit',
-                                components: 'Search',
-                                style: { width: '100px' },
-                            },
-                        ],
-                        style: { 'display': 'flex', 'justify-content': 'center', 'margin-top': '20px' },
-                    },
+                  {
+                    tagName: "select",
+                    attributes: { id: "select1", name: "from" },
+                    style: { width: "150px", "margin-right": "10px" },
+                    components: [
+                      {
+                        tagName: "option",
+                        attributes: { value: "" },
+                        components: "From",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "NYC" },
+                        components: "New York",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "LAX" },
+                        components: "Los Angeles",
+                      },
+                    ],
+                  },
+                  {
+                    tagName: "select",
+                    attributes: { id: "select2", name: "to" },
+                    style: { width: "150px", "margin-right": "10px" },
+                    components: [
+                      {
+                        tagName: "option",
+                        attributes: { value: "" },
+                        components: "To",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "NYC" },
+                        components: "New York",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "LAX" },
+                        components: "Los Angeles",
+                      },
+                    ],
+                  },
+                  {
+                    tagName: "input",
+                    attributes: { type: "date", name: "departure" },
+                    style: { width: "150px", "margin-right": "10px" },
+                  },
+                  {
+                    tagName: "input",
+                    attributes: { type: "date", name: "arrival" },
+                    style: { width: "150px", "margin-right": "10px" },
+                  },
+                  {
+                    tagName: "select",
+                    attributes: { name: "pax" },
+                    style: { width: "150px", "margin-right": "10px" },
+                    components: [
+                      {
+                        tagName: "option",
+                        attributes: { value: "1" },
+                        components: "1",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "2" },
+                        components: "2",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "3" },
+                        components: "3",
+                      },
+                      {
+                        tagName: "option",
+                        attributes: { value: "4" },
+                        components: "4",
+                      },
+                    ],
+                  },
+                  {
+                    tagName: "button",
+                    type: "submit",
+                    components: "Search",
+                    style: { width: "100px" },
+                  },
                 ],
-                script: function () {
-                    const form = this;
-                    let initialHighlightDone = false;
-                    function changeTableContent(date) {
-                        var companies = document.querySelectorAll('#content-table tr:not(:first-child) td:first-child');
-                        companies.forEach(function (company, index) {
-                            company.textContent = "New Company " + (index + 1);
-                        });
-                    }
+                style: {
+                  display: "flex",
+                  "justify-content": "center",
+                  "margin-top": "20px",
+                },
+              },
+            ],
+          },
+        ],
+        script: function () {
+          const form = this;
+          let initialHighlightDone = false;
+          async function changeTableContent(chosenDate) {
+            try {
+              // Fetch data from the text file
+              const response = await fetch("http://localhost:8080/data");
+              const text = await response.text();
+              const dummyData = JSON.parse(text);
 
-                    form.onsubmit = function (e) {
-                        e.preventDefault();
+              // Find the departure table
+              const departureTable = document.getElementById("content-table");
+              const trElement = departureTable.querySelector("tr");
+              const date = trElement.dataset.date;
+              console.log(trElement);
+              console.log(date); // outputs: "June 11, 2024"
+              console.log(departureTable);
+              for (let i = 1; i < departureTable.rows.length; i++) {
+                const row = departureTable.rows[i];
+                console.log(row.getAttribute("data-date"));
+                if (row.getAttribute("data-date") != chosenDate) {
+                  row.remove();
+                }
+              }
 
-                        const from = form.querySelector('[name="from"]').value;
-                        const to = form.querySelector('[name="to"]').value;
-                        const departure = new Date(form.querySelector('[name="departure"]').value);
-                        const arrival = new Date(form.querySelector('[name="arrival"]').value);
-                        const pax = form.querySelector('[name="pax"]').value;
-                        const styleTag = document.createElement('style');
-                        styleTag.textContent = `
+              // Loop through the dummy data to add new rows for the chosen date
+              dummyData.forEach((data) => {
+                console.log(data.date);
+                // Check if the date attribute matches the chosen date
+                // Function to check if a row with the same data-date already exists
+                function rowExists(date) {
+                  const rows = document.querySelectorAll(
+                    `tr[data-date="${date}"]`
+                  );
+                  return rows.length > 0;
+                }
+
+                if (data.date === chosenDate) {
+                  // Check if a row with the chosen date already exists
+                  if (!rowExists(chosenDate)) {
+                    // Create a new row for the data
+                    const newRow = `
+          <tr data-date="${chosenDate}">
+              <td>${data.trainService}</td>
+              <td>${data.departure}</td>
+              <td>${data.arrival}</td>
+              <td>${data.duration}</td>
+              <td>${data.availableSeats}</td>
+              <td>${data.minFare}</td>
+          </tr>
+      `;
+                    // Append the new row to the table
+                    departureTable.innerHTML += newRow;
+                  }
+                }
+              });
+            } catch (error) {
+              console.error("Error loading data:", error);
+            }
+          }
+
+          form.onsubmit = function (e) {
+            e.preventDefault();
+
+            const from = form.querySelector('[name="from"]').value;
+            const to = form.querySelector('[name="to"]').value;
+            const departure = new Date(
+              form.querySelector('[name="departure"]').value
+            );
+            const arrival = new Date(
+              form.querySelector('[name="arrival"]').value
+            );
+            const pax = form.querySelector('[name="pax"]').value;
+            const styleTag = document.createElement("style");
+            styleTag.textContent = `
                           table {
                             font-family: arial, sans-serif;
                             border-collapse: collapse;
@@ -117,169 +247,148 @@ export default (editor, opts = {}) => {
                           }
                         `;
 
-                        // Append style tag to the document head
-                        document.head.appendChild(styleTag);
+            // Append style tag to the document head
+            document.head.appendChild(styleTag);
+            var studentDiv = document.querySelector("div.divstudent");
+            let departureDiv = document.querySelector(".date-table-container");
 
-                        let departureDiv = document.querySelector('.date-table-container');
-                        if (!departureDiv) {
-                            departureDiv = document.createElement('div');
-                            departureDiv.classList.add('date-table-container');
-                            form.parentNode.appendChild(departureDiv);
-                        }
+            // Check if departureDiv already exists
+            if (!departureDiv) {
+              departureDiv = document.createElement("div");
+              departureDiv.classList.add("date-table-container");
 
-                        departureDiv.innerHTML = `
-                        <div class="date-table-container" id="dateTableContainer">
+              // Set inner HTML only if departureDiv is newly created
+              departureDiv.innerHTML = `
+                    <div class="date-table-container" id="dateTableContainer">
                         <div class="date-table" id="dateTable">
-                        <h3>Departure</h3>
-                          <!-- Date items will be dynamically inserted here -->
+                            <h3 style={{margin-top:50px}}>Departure</h3>
+                            <!-- Date items will be dynamically inserted here -->
                         </div>
-                      </div>
-                      <table id="content-table">
+                    </div>
+                    <table id="content-table">
                         <tr>
-                <th>Train service</th>
-                <th>Departure</th>
-                <th>Arrival</th>
-                <th>Duration</th>
-                <th>Available seats</th>
-                <th>Min. fare</th>
-              </tr>
-              <tr>
-                <td>Express Thunderbolt</td>
-                <td>8:00 AM</td>
-                <td>12:30 PM</td>
-                <td>4 hours 30 minutes</td>
-                <td>120</td>
-                <td>$50</td>
-              </tr>
-              <tr>
-                <td>Rapid Rail Runner</td>
-                <td>10:15 AM</td>
-                <td>3:45 PM</td>
-                <td>5 hours 30 minutes</td>
-                <td>90</td>
-                <td>$45</td>
-              </tr>
-              <tr>
-                <td>Swift Streamliner</td>
-                <td>1:30 PM</td>
-                <td>6:00 PM</td>
-                <td>4 hours 30 minutes</td>
-                <td>100</td>
-                <td>$55</td>
-              </tr>
-              <tr>
-                <td>Express Eagle</td>
-                <td>3:45 PM</td>
-                <td>8:15 PM</td>
-                <td>4 hours 30 minutes</td>
-                <td>80</td>
-                <td>$60</td>
-              </tr>
-              <tr>
-                <td>Coastal Voyager</td>
-                <td>6:00 PM</td>
-                <td>10:30 PM</td>
-                <td>4 hours 30 minutes</td>
-                <td>110</td>
-                <td>$48</td>
-              </tr>
-              <tr>
-                <td>Super Sonic Express</td>
-                <td>9:00 PM</td>
-                <td>1:30 AM</td>
-                <td>4 hours 30 minutes</td>
-                <td>70</td>
-                <td>$65</td>
-              </tr>
-              
-                      </table>
-          `;
-                        form.parentNode.appendChild(departureDiv);
+                            <th>Train service</th>
+                            <th>Departure</th>
+                            <th>Arrival</th>
+                            <th>Duration</th>
+                            <th>Available seats</th>
+                            <th>Min. fare</th>
+                        </tr>
+                    </table>
+                `;
+              studentDiv.insertAdjacentHTML("afterend", departureDiv.outerHTML);
+            }
 
-                        let startIndex = 0;
-                        let endIndex = 3; // Show 4 date items initially
-                        let currentBaseDate = departure;
+            let startIndex = 0;
+            let endIndex = 3; // Show 4 date items initially
+            let currentBaseDate = departure;
 
-                        function getDatesRow(chosenDate) {
-                            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                            let dataItems = [];
-                            for (let i = -3; i <= 3; i++) {
-                                const date = new Date(chosenDate);
-                                date.setDate(chosenDate.getDate() + i);
-                                const formattedDate = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-                                dataItems.push(formattedDate);
-                            }
-                            return dataItems;
-                        }
+            function getDatesRow(chosenDate) {
+              const months = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ];
+              let dataItems = [];
+              for (let i = -3; i <= 3; i++) {
+                const date = new Date(chosenDate);
+                date.setDate(chosenDate.getDate() + i);
+                const formattedDate = `${
+                  months[date.getMonth()]
+                } ${date.getDate()}, ${date.getFullYear()}`;
+                dataItems.push(formattedDate);
+              }
+              return dataItems;
+            }
 
-                        function renderDateItems(baseDate) {
-                            var dateTable = document.getElementById("dateTable");
-                            dateTable.innerHTML = ""; // Clear previous date items
+            function renderDateItems(baseDate) {
+              var dateTable = document.getElementById("dateTable");
+              dateTable.innerHTML = ""; // Clear previous date items
 
-                            let dateItems = getDatesRow(baseDate);
+              let dateItems = getDatesRow(baseDate);
 
-                            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                            const formattedDepartureDate = `${months[departure.getMonth()]} ${departure.getDate()}, ${departure.getFullYear()}`;
-                            for (let i = 0; i < dateItems.length; i++) {
-                                let dateItem = document.createElement("div");
-                                dateItem.className = "date-item";
-                                dateItem.textContent = dateItems[i];
-                                dateTable.appendChild(dateItem);
+              const months = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ];
+              const formattedDepartureDate = `${
+                months[departure.getMonth()]
+              } ${departure.getDate()}, ${departure.getFullYear()}`;
+              for (let i = 0; i < dateItems.length; i++) {
+                let dateItem = document.createElement("div");
+                dateItem.className = "date-item";
+                dateItem.textContent = dateItems[i];
+                dateTable.appendChild(dateItem);
 
-                                // Highlight the initially selected departure date only once
-                                if (!initialHighlightDone && dateItems[i] === formattedDepartureDate) {
-                                    dateItem.classList.add('selected');
-                                    initialHighlightDone = true;  // Set the flag to true after highlighting
-                                }
-                                // Add event listener to toggle highlighting and call changeTableContent
-                                dateItem.addEventListener("click", function () {
-                                    // Remove highlighting from previously selected date items
-                                    let selectedDateItems = document.querySelectorAll('.date-item.selected');
-                                    selectedDateItems.forEach(function (item) {
-                                        item.classList.remove('selected');
-                                    });
+                // Highlight the initially selected departure date only once
+                if (dateItems[i] === formattedDepartureDate) {
+                  changeTableContent(dateItem.textContent);
+                  dateItem.classList.add("selected");
+                }
+                // Add event listener to toggle highlighting and call changeTableContent
+                dateItem.addEventListener("click", function () {
+                  // Remove highlighting from previously selected date items
+                  let selectedDateItems = document.querySelectorAll(
+                    ".date-item.selected"
+                  );
+                  selectedDateItems.forEach(function (item) {
+                    item.classList.remove("selected");
+                  });
 
+                  // Add highlighting to the clicked date item
+                  this.classList.add("selected");
 
-                                    // Add highlighting to the clicked date item
-                                    this.classList.add('selected');
+                  // Call changeTableContent with the selected date
+                  changeTableContent(this.textContent);
+                });
 
-                                    // Call changeTableContent with the selected date
-                                    changeTableContent(this.textContent);
-                                });
+                // Add navigation to previous/next dates
+                if (i === 0) {
+                  dateItem.classList.add("nav-button");
+                  dateItem.addEventListener("click", loadPreviousDates);
+                } else if (i === dateItems.length - 1) {
+                  dateItem.classList.add("nav-button");
+                  dateItem.addEventListener("click", loadNextDates);
+                }
+              }
+            }
 
-                                // Add navigation to previous/next dates
-                                if (i === 0) {
-                                    dateItem.classList.add("nav-button");
-                                    dateItem.addEventListener("click", loadPreviousDates);
-                                } else if (i === dateItems.length - 1) {
-                                    dateItem.classList.add("nav-button");
-                                    dateItem.addEventListener("click", loadNextDates);
-                                }
-                            }
-                        }
+            function loadPreviousDates() {
+              currentBaseDate.setDate(currentBaseDate.getDate() - 4);
+              renderDateItems(currentBaseDate);
+            }
 
-                        function loadPreviousDates() {
-                            currentBaseDate.setDate(currentBaseDate.getDate() - 4);
-                            renderDateItems(currentBaseDate);
-                        }
+            function loadNextDates() {
+              currentBaseDate.setDate(currentBaseDate.getDate() + 4);
+              renderDateItems(currentBaseDate);
+            }
 
-                        function loadNextDates() {
-                            currentBaseDate.setDate(currentBaseDate.getDate() + 4);
-                            renderDateItems(currentBaseDate);
-                        }
-
-                        renderDateItems(currentBaseDate);
-                    };
-                },
-            },
+            renderDateItems(currentBaseDate);
+          };
         },
-    });
-
-
+      },
+    },
+  });
 };
-
-
-
 
 // export default (editor, opts = {}) => {
 //     const domc = editor.DomComponents;
@@ -541,11 +650,6 @@ export default (editor, opts = {}) => {
 //         });
 //         }
 
-
-
-
-
-
 // export default (editor, opts = {}) => {
 //     const domc = editor.DomComponents;
 
@@ -666,8 +770,6 @@ export default (editor, opts = {}) => {
 //         },
 //     });
 // };
-
-
 
 // export default (editor, opts = {}) => {
 //     const domc = editor.DomComponents;

@@ -1,0 +1,20 @@
+[
+    {
+        "date": "June 11, 2024",
+        "trainService": "Express Thunderbolt",
+        "departure": "8:00 AM",
+        "arrival": "12:30 PM",
+        "duration": "4 hours 30 minutes",
+        "availableSeats": 120,
+        "minFare": "$50"
+    },
+    {
+        "date": "2024-06-06",
+        "trainService": "Rapid Rail Runner",
+        "departure": "10:15 AM",
+        "arrival": "3:45 PM",
+        "duration": "5 hours 30 minutes",
+        "availableSeats": 90,
+        "minFare": "$45"
+    }
+]
