@@ -12,19 +12,20 @@ Clone the repository:
 git clone https://github.com/dariuschew/websitebuilder.git
 cd <repository-directory>
 
-Install dependencies for the backend:
+[OPEN 2 SEPARATE TERMINALS]
+Install dependencies for the backend: [TERMINAL 1]
 cd backend
 npm install
 
-Install dependencies for the frontend:
-cd ../frontend
+Install dependencies for the frontend: [TERMINAL 2]
+cd frontend
 npm install
 
-Running the Project
+Running the Project [TERMINAL 1]
 Start the backend:
 cd backend
 npm start
 
-Start the frontend:
-cd ../frontend
+Start the frontend: [TERMINAL 2]
+cd frontend
 npm start
