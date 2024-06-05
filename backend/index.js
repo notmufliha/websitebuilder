@@ -1,4 +1,4 @@
-require('dotenv').config();
-require('babel-register');
-require('./server');
+require('dotenv').config()
+require('babel-register')
+require('./server')
 //something else

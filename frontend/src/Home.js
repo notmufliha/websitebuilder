@@ -66,57 +66,58 @@ const Home = () => {
   const handleExport = async () => {
     try {
       const generateBackendResponse = await fetch(
-        "http://localhost:8080/api/generateAndSendBackend",
+        'http://localhost:8080/api/generateAndSendBackend',
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             /* Any necessary parameters */
-          }),
+          })
         }
-      );
+      )
       if (!generateBackendResponse.ok) {
-        throw new Error('Error generating backend');
+        throw new Error('Error generating backend')
       }
 
-      const pageDataPromises = selectedPages.map(async (pageId) => {
+      const pageDataPromises = selectedPages.map(async pageId => {
         try {
           const response = await fetch(
             `http://localhost:8080/api/pages/${pageId}`
-          );
-          if (!response.ok) throw new Error("Network response was not ok.");
-          const data = await response.json();
+          )
+          if (!response.ok) throw new Error('Network response was not ok.')
+          const data = await response.json()
 
           // Check if data or content is null or empty
-          if (!data || !data.content || !data.content["mycustom-html"]) {
+          if (!data || !data.content || !data.content['mycustom-html']) {
             // Notify user if the page data is null or empty
-            toast.error(`Page ${data.name} has no content or does not exist.`);
-            return null;
+            toast.error(`Page ${data.name} has no content or does not exist.`)
+            return null
           }
 
-          const cleanedHTML = data.content["mycustom-html"];
-          const cleanedCSS = data.content["mycustom-css"];
+          const cleanedHTML = data.content['mycustom-html']
+          const cleanedCSS = data.content['mycustom-css']
           const cleanedComponents = JSON.parse(
-            data.content["mycustom-components"]
-          );
-          const cleanedAssets = JSON.parse(data.content["mycustom-assets"]);
+            data.content['mycustom-components']
+          )
+          const cleanedAssets = JSON.parse(data.content['mycustom-assets'])
 
           // const componentsResponse = await fetch(
           //   `http://localhost:8080/api/pages/${pageId}/components`
-          // );
-          // if (!componentsResponse.ok) throw new Error('Failed to fetch components.');
-          // const componentsData = await componentsResponse.json();
+          // )
+          // if (!componentsResponse.ok)
+          //   throw new Error('Failed to fetch components.')
+          // const componentsData = await componentsResponse.json()
 
           // await fetch('http://localhost:8080/api/pages/components', {
           //   method: 'POST',
           //   headers: { 'Content-Type': 'application/json' },
           //   body: JSON.stringify({
           //     pageId,
-          //     components: componentsData.components,
-          //   }),
-          // });
+          //     components: componentsData.components
+          //   })
+          // })
 
           // const sqlResponse = await fetch(
           //   `http://localhost:8080/api/pages/${pageId}/sqldump`
@@ -124,100 +125,104 @@ const Home = () => {
           // if (!sqlResponse.ok) throw new Error('Failed to fetch SQL dump.');
           // const sqlBlob = await sqlResponse.blob();
 
-
           return {
             html: cleanedHTML,
             css: cleanedCSS,
             components: cleanedComponents,
             assets: cleanedAssets,
             pageId,
-            name: data.name,
-          };
+            name: data.name
+            //  sqlBlob
+          }
         } catch (error) {
-          console.error("Error fetching page data:", error);
+          console.error('Error fetching page data:', error)
           // Notify user if there's an error fetching page data
-          toast.error("Error fetching page data. Please try again later.");
-          return null;
+          toast.error('Error fetching page data. Please try again later.')
+          return null
         }
-      });
-      const pageData = await Promise.all(pageDataPromises);
+      })
+      const pageData = await Promise.all(pageDataPromises)
 
       // Filter out null entries before further processing
-      const validPageData = pageData.filter((page) => page !== null);
+      const validPageData = pageData.filter(page => page !== null)
 
       // If no valid page data, return without exporting
       if (validPageData.length === 0) {
-        toast.error(`Page chosen has no content or does not exist.`);
-        return;
+        toast.error(`Page chosen has no content or does not exist.`)
+        return
       }
 
-      // Create a new ZIP archive 
-      const zipBlob = await generateBackendResponse.blob();
-      const zip = new JSZip();
+      // Create a new ZIP archive
+      const zipBlob = await generateBackendResponse.blob()
+      const zip = new JSZip()
+      // const sqlFolder = zip.folder('sql')
 
-      const zip2 = await JSZip.loadAsync(zipBlob);
+      const zip2 = await JSZip.loadAsync(zipBlob)
 
       // Create a new folder called 'backend' if it doesn't exist
-      const backendFolder = zip.folder("backend") || zip.folder();
+      const backendFolder = zip.folder('backend') || zip.folder()
 
-      const filesToRemove = []; // Store files to remove after iteration
+      const filesToRemove = [] // Store files to remove after iteration
 
       zip2.forEach((relativePath, file) => {
         if (!file.dir) {
           // Move files into the 'backend' folder
-          backendFolder.file(relativePath, file.async("blob"));
-          console.log(relativePath);
+          backendFolder.file(relativePath, file.async('blob'))
+          console.log(relativePath)
           // Store the original file to remove later
-          filesToRemove.push(relativePath);
+          filesToRemove.push(relativePath)
         }
-      });
+      })
 
       // Remove the original files from the zip
-      filesToRemove.forEach((relativePath) => {
-        delete zip.files[relativePath];
-      });
+      filesToRemove.forEach(relativePath => {
+        delete zip.files[relativePath]
+      })
 
-      const frontendFolder = zip.folder("frontend");
+      const frontendFolder = zip.folder('frontend')
 
-      const cssFolder = frontendFolder.folder("css");
-      // const sqlFolder = zip.folder('sql');
+      const cssFolder = frontendFolder.folder('css')
 
       // Fix the function to handle HTML template placeholders
-      function createTemplatePlaceholders(html) {
-        const userInputPlaceholder = "{{userInputPlaceholder}}";
-        const tagPlaceholders = {}; // Define tagPlaceholders if it's not defined already
+      function createTemplatePlaceholders (html) {
+        const userInputPlaceholder = '{{userInputPlaceholder}}'
+        const tagPlaceholders = {} // Define tagPlaceholders if it's not defined already
 
         // Loop through tagPlaceholders and replace attributes in html
         for (const [tag, _] of Object.entries(tagPlaceholders)) {
-          const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, "g");
+          const regex = new RegExp(`(<${tag}[^>]*>)([^<]+)(<\/${tag}>)`, 'g')
           html = html.replace(
             regex,
             (match, openingTag, content, closingTag) => {
               // Replace attributes except specific ones with userInputPlaceholder
-              const replacedOpeningTag = openingTag.replace(/(\w+)="[^"]*"/g, (attr) => {
-                const attributeName = attr.split('=')[0];
-                if (
-                  attributeName !== "id" &&
-                  attributeName !== "class" &&
-                  attributeName !== "gjs" &&
-                  attributeName !== "customId" &&
-                  attributeName !== "frameborder"
-                ) {
-                  return `${attributeName}=${userInputPlaceholder}`;
+              const replacedOpeningTag = openingTag.replace(
+                /(\w+)="[^"]*"/g,
+                attr => {
+                  const attributeName = attr.split('=')[0]
+                  if (
+                    attributeName !== 'id' &&
+                    attributeName !== 'class' &&
+                    attributeName !== 'gjs' &&
+                    attributeName !== 'customId' &&
+                    attributeName !== 'frameborder'
+                  ) {
+                    return `${attributeName}=${userInputPlaceholder}`
+                  }
+                  return attr
                 }
-                return attr;
-              });
-              return replacedOpeningTag + content + closingTag;
+              )
+              return replacedOpeningTag + content + closingTag
             }
-          );
+          )
         }
-        return html;
+        return html
       }
 
       // Add the HTML and CSS for each page to the ZIP archive
       validPageData.forEach(({ html, css, assets, pageId, name }) => {
-        const htmlWithPlaceholders = createTemplatePlaceholders(html);
-        console.log(htmlWithPlaceholders);
+        //   validPageData.forEach(({ html, css, assets, pageId, name, sqlBlob }) => {
+        const htmlWithPlaceholders = createTemplatePlaceholders(html)
+        console.log(htmlWithPlaceholders)
         if (html) {
           // Construct HTML content with proper structure
           const htmlContent = `
@@ -228,77 +233,134 @@ const Home = () => {
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
                             <title>${name}</title>
-                            <link rel="stylesheet" href="css/style_${name.replace(/\s/g, "_").toLowerCase()}.css">
+                            <link rel="stylesheet" href="css/style_${name
+                              .replace(/\s/g, '_')
+                              .toLowerCase()}.css">
                         </head>
                         <body>
                             ${htmlWithPlaceholders}
                         </body>
                     </html>
-                `;
+                `
 
           // Add HTML file to the ZIP archive
-          frontendFolder.file(`${name}.html`, htmlContent);
+          frontendFolder.file(`${name}.html`, htmlContent)
 
           // Add CSS file to the CSS folder with naming convention style_pagename.css
           cssFolder.file(
-            `style_${name.replace(/\s/g, "_").toLowerCase()}.css`,
+            `style_${name.replace(/\s/g, '_').toLowerCase()}.css`,
             css
-          );
+          )
+          console.log(`HTML and CSS files created for page ${pageId}`)
 
-          // Add assets to the ZIP archive
           assets.forEach((asset, index) => {
-            const filename = `images/${pageId}_image_${index + 1}.jpg`;
+            const filename = `images/${pageId}_image_${index + 1}.jpg`
             // Fetch assets and add them to the ZIP
-            fetch(asset.src, { mode: "no-cors" })
-              .then((response) => response.blob())
-              .then((blob) => {
-                frontendFolder.file(filename, blob);
+            fetch(asset.src, { mode: 'no-cors' })
+              .then(response => response.blob())
+              .then(blob => {
+                frontendFolder.file(filename, blob)
               })
-              .catch((error) => console.error("Error fetching asset:", error));
-          });
-          // sqlFolder.file(`${pageId}.sql`, sqlBlob);
+              .catch(error => console.error('Error fetching asset:', error))
+          })
+
+          //  sqlFolder.file(`${pageId}.sql`, sqlBlob) // Add the SQL dump to the ZIP
         }
-      });
+      })
 
       // Generate the ZIP archive
-      zip.generateAsync({ type: "blob" }).then(async (content) => {
-        toast.success(`Page successfully exported.`);
-        saveAs(content, "pages.zip");
-      });
+      zip.generateAsync({ type: 'blob' }).then(async content => {
+        console.log('{handleExport} Generated ZIP archive successfully')
+        toast.success(`Page successfully exported.`)
+        saveAs(content, 'pages.zip')
+        console.log('{handleExport} Saved ZIP archive as pages.zip')
+      })
 
-      setSelectedPages([]);
+      // Generate the final ZIP file
+      const finalZipBlob = await zip.generateAsync({ type: 'blob' })
+      console.log('{handleExport} Generated final ZIP file blob')
+
+      // Create a FormData object
+      const formData = new FormData()
+      formData.append('file', finalZipBlob, 'pages.zip')
+      console.log(
+        '{handleExport} Created FormData object and appended the final ZIP blob'
+      )
+
+      // Send the ZIP file to the /save-export endpoint
+      const response = await fetch(
+        'http://localhost:8080/api/pages/save-export',
+        {
+          method: 'POST',
+          body: formData
+        }
+      )
+      console.log(
+        '{handleExport} Sent the ZIP file to the /save-export endpoint'
+      )
+
+      if (!response.ok) {
+        console.error(
+          '{handleExport} Error response from /save-export endpoint:',
+          response.statusText
+        )
+        throw new Error('Error saving exported files')
+      } else {
+        console.log('{handleExport} Successfully saved exported files')
+      }
+
+      // Notify user of success
+      toast.success('Files have been successfully exported and saved')
+      console.log('{handleExport} Notified user of successful export')
+
+      setSelectedPages([])
     } catch (error) {
-      console.error("Error generating backend and exporting pages:", error);
+      console.error('Error generating backend and exporting pages:', error)
       toast.error(
-        "Error generating backend and exporting pages. Please try again later."
-      );
+        'Error generating backend and exporting pages. Please try again later.'
+      )
     }
-  };
-
-
+  }
 
   const handleExport2 = async () => {
     const pageDataPromises = selectedPages.map(async pageId => {
       try {
+        console.log(`[Page ${pageId}] Fetching page data...`)
         const response = await fetch(
           `http://localhost:8080/api/pages/${pageId}`
         )
         const data = await response.json()
 
-        // Check if data or content is null or empty
-        if (!data || !data.content || !data.content["mycustom-html"]) {
-          // Notify user if the page data is null or empty
+        if (!data || !data.content || !data.content['mycustom-html']) {
           toast.error(`Page ${data.name} has no content or does not exist.`)
+          console.log(`[Page ${pageId}] No content or page does not exist.`)
           return null
         }
 
-        // Clean the HTML string
         const cleanedHTML = data.content['mycustom-html']
         const cleanedCSS = data.content['mycustom-css']
         const cleanedComponents = JSON.parse(
           data.content['mycustom-components']
         )
         const cleanedAssets = JSON.parse(data.content['mycustom-assets'])
+
+        console.log(`[Page ${pageId}] Fetching additional components data...`)
+        const componentsResponse = await fetch(
+          `http://localhost:8080/api/pages/${pageId}/components`
+        )
+        if (!componentsResponse.ok)
+          throw new Error('Failed to fetch components.')
+        const componentsData = await componentsResponse.json()
+
+        console.log(`[Page ${pageId}] Posting components data...`)
+        await fetch('http://localhost:8080/api/pages/components', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pageId,
+            components: componentsData.components
+          })
+        })
 
         return {
           html: cleanedHTML,
@@ -309,43 +371,114 @@ const Home = () => {
           name: data.name
         }
       } catch (error) {
-        console.error('Error fetching page data:', error)
-        // Notify user if there's an error fetching page data
+        console.error(`[Page ${pageId}] Error fetching page data:`, error)
         toast.error('Error fetching page data. Please try again later.')
         return null
       }
     })
 
-    // Wait for all page data promises to resolve
     const pageData = await Promise.all(pageDataPromises)
-
-    // Filter out null entries before further processing
     const validPageData = pageData.filter(page => page !== null)
 
-    // If no valid page data, return without exporting
     if (validPageData.length === 0) {
       toast.error(`Page chosen has no content or does not exist.`)
+      console.log(`No valid page data available for export.`)
       return
     }
-    const pageId = selectedPages[0];
 
     try {
-      const response = await fetch(`http://localhost:8080/api/pages/sql/1`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch page data: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('Page data:', data);
-      // Process data as needed
-    } catch (error) {
-      console.error('Error fetching page data:', error);
-    }
+      const filesArray = []
 
+      for (const { html, css, pageId, name } of validPageData) {
+        // console.log(`[Page ${pageId}] Fetching SQL dump...`)
+        // const sqlDumpResponse = await fetch(
+        //   `http://localhost:8080/api/pages/${pageId}/sqldump`
+        // )
+        // if (!sqlDumpResponse.ok) {
+        //   throw new Error(
+        //     `Failed to fetch SQL dump for page ${pageId}. Status: ${sqlDumpResponse.status}`
+        //   )
+        // }
+        // const sqlDump = await sqlDumpResponse.text()
 
+        //         const content2 = `
+        //   #!/bin/bash
+        //   LOG_FILE="/home/user/logfile.log"
+        //   exec > >(tee -i $LOG_FILE)
+        //   exec 2>&1
 
-    const filesArray = []
+        //   echo "Starting the script execution..."
 
-    const content2 = `
+        //   check_mysql_installed() {
+        //       echo "Checking if MySQL is installed..."
+        //       mysql --version >/dev/null 2>&1
+        //       if [ $? -eq 0 ]; then
+        //           echo "MySQL is installed."
+        //       else
+        //           echo "MySQL is not installed."
+        //       fi
+        //       return $?
+        //   }
+
+        //   install_mysql() {
+        //       echo "Installing MySQL..."
+        //       sudo apt-get update
+        //       sudo apt-get install mysql-server -y
+        //       if [ $? -eq 0 ]; then
+        //           echo "MySQL installed successfully."
+        //       else
+        //           echo "Failed to install MySQL."
+        //           exit 1
+        //       fi
+        //   }
+
+        //   create_table() {
+        //       echo "Creating database and tables..."
+        //       read -p "Enter MySQL root password (leave empty if none): " mysql_password
+        //       if [ -z "$mysql_password" ]; then
+        //           echo "No password provided, using default authentication method."
+        //           mysql -u root <<\`EOF\`
+        //   CREATE DATABASE IF NOT EXISTS test_db;
+        //   USE test_db;
+        //   ${sqlDump}
+        // \`EOF\`
+        //           if [ $? -eq 0 ]; then
+        //               echo "Database and tables created successfully with default authentication."
+        //           else
+        //               echo "Failed to create database and tables with default authentication."
+        //               exit 1
+        //           fi
+        //       else
+        //           echo "Password provided, using it for authentication."
+        //           mysql -u root -p"\$mysql_password" <<\`EOF\`
+        //   CREATE DATABASE IF NOT EXISTS test_db;
+        //   USE test_db;
+        //   ${sqlDump}
+        // \`EOF\`
+        //           if [ $? -eq 0 ]; then
+        //               echo "Database and tables created successfully with provided password."
+        //           else
+        //               echo "Failed to create database and tables with provided password."
+        //               exit 1
+        //           fi
+        //       fi
+        //   }
+
+        //   main() {
+        //       echo "Starting script execution..."
+        //       if check_mysql_installed; then
+        //           echo "MySQL is already installed."
+        //       else
+        //           echo "MySQL is not installed. Installing..."
+        //           install_mysql
+        //       fi
+        //       create_table
+        //       echo "Script execution completed."
+        //   }
+        //   main
+        //   `
+
+        const content2 = `
 #!/bin/bash
 # Function to check if MySQL is installed
 check_mysql_installed() {
@@ -424,53 +557,50 @@ main() {
     create_table
 }
 main
-`;
+`
 
+        filesArray.push({ name: `mysql_setup.sh`, content: content2 })
 
-    filesArray.push({ name: `mysql_setup.sh`, content: content2 });
-
-    // Add HTML and CSS files to the filesArray
-    validPageData.forEach(({ html, css, name }) => {
-      if (html && css) {
-        // Construct HTML content with proper structure
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${name}</title>
-            <link rel="stylesheet" href="css/style_${name
-            .replace(/\s/g, '_')
-            .toLowerCase()}.css">
-          </head>
-          <body>
-            ${html}
-          </body>
-          </html>
-        `
-        filesArray.push({ name: `${name}.html`, content: htmlContent })
-        filesArray.push({
-          name: `style_${name.replace(/\s/g, '_').toLowerCase()}.css`,
-          content: css
-        })
+        if (html && css) {
+          const htmlContent = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${name}</title>
+    <link rel="stylesheet" href="css/style_${name
+      .replace(/\s/g, '_')
+      .toLowerCase()}.css">
+  </head>
+  <body>
+    ${html}
+  </body>
+  </html>
+          `
+          filesArray.push({ name: `${name}.html`, content: htmlContent })
+          filesArray.push({
+            name: `style_${name.replace(/\s/g, '_').toLowerCase()}.css`,
+            content: css
+          })
+        }
       }
-    })
 
-    try {
-      // Send the HTML and CSS files array to the server using fetch
-      const response = await fetch("http://localhost:8080/api/pages/test", {
-        method: "POST",
+      console.log(`Sending files array to the server...`)
+      const response = await fetch('http://localhost:8080/api/pages/test', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ files: filesArray })
       })
 
       if (response.ok) {
         toast.success(`Page successfully exported.`)
+        console.log(`Page export successful.`)
       } else {
         toast.error(`Failed to export page. Status: ${response.status}`)
+        console.error(`Failed to export page. Status: ${response.status}`)
       }
     } catch (error) {
       console.error('Error exporting page:', error)
@@ -480,10 +610,9 @@ main
     setSelectedPages([])
   }
 
-
   return (
-    <div style={{ paddingTop: "40px", fontFamily: "Arial, sans-serif" }}>
-      <div style={{ maxWidth: "800px", margin: "auto" }}>
+    <div style={{ paddingTop: '40px', fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ maxWidth: '800px', margin: 'auto' }}>
         <form>
           <div
             style={{
@@ -517,7 +646,7 @@ main
                 onChange={e => setName(e.target.value)}
               />
               {!isValid && (
-                <div style={{ color: "#ff4d4f", marginTop: "5px" }}>
+                <div style={{ color: '#ff4d4f', marginTop: '5px' }}>
                   Please provide a valid name.
                 </div>
               )}

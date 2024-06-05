@@ -166,20 +166,25 @@ const ensureDirectoryExistence = filePath => {
 
 export const fetchPageDataAsSqlDump = async (pageId, schemaName = 'default_schema') => {
   const escapedPageId = mysql.escape(pageId)
+  console.log(`{fetchPageDataAsSqlDump} Escaped Page ID: ${escapedPageId}`)
+
   const schemaCreation = `CREATE DATABASE IF NOT EXISTS ${schemaName}; USE ${schemaName};`
+  console.log(`{fetchPageDataAsSqlDump} Schema Creation SQL: ${schemaCreation}`)
+
   const tableCreation = `
     CREATE TABLE IF NOT EXISTS components (
-      component_id INT AUTO_INCREMENT PRIMARY KEY,
+      component_id VARCHAR(255) PRIMARY KEY,
       page_id VARCHAR(255)
     ); 
     CREATE TABLE IF NOT EXISTS component_attributes (
-      component_id INT,
+      component_id VARCHAR(255),
       attribute_key VARCHAR(255),
       attribute_value TEXT,
       PRIMARY KEY (component_id, attribute_key),
       FOREIGN KEY (component_id) REFERENCES components(component_id)
     );
-  `.replace(/\n/g, ' ')
+  `.trim()
+  console.log(`{fetchPageDataAsSqlDump} Table Creation SQL: ${tableCreation}`)
 
   // Add a query to fetch component data as well
   const queries = [
@@ -187,18 +192,21 @@ export const fetchPageDataAsSqlDump = async (pageId, schemaName = 'default_schem
     `SELECT component_id, attribute_key, attribute_value FROM component_attributes WHERE component_id IN (SELECT component_id FROM components WHERE page_id = ${escapedPageId})`,
   ]
 
-  console.log(`Starting SQL dump for page ID: ${pageId}`)
+  console.log(`{fetchPageDataAsSqlDump} Starting SQL dump for page ID: ${pageId}`)
+  console.log(`{fetchPageDataAsSqlDump} Queries: ${JSON.stringify(queries)}`)
 
   try {
     const results = await Promise.all(
       queries.map(
         query =>
           new Promise((resolve, reject) => {
+            console.log(`{fetchPageDataAsSqlDump} Executing query: ${query}`)
             connection.query(query, (err, results) => {
               if (err) {
-                console.error(`Error executing query: ${query}`, err)
+                console.error(`{fetchPageDataAsSqlDump} Error executing query: ${query}`, err)
                 reject(err)
               } else {
+                console.log(`{fetchPageDataAsSqlDump} Query results: ${JSON.stringify(results)}`)
                 resolve(results)
               }
             })
@@ -213,6 +221,7 @@ export const fetchPageDataAsSqlDump = async (pageId, schemaName = 'default_schem
           row.component_id,
         )}, ${mysql.escape(row.page_id)});`,
     )
+    console.log(`{fetchPageDataAsSqlDump} Component Inserts: ${JSON.stringify(componentInserts)}`)
 
     // Generate SQL insert statements for component attributes
     const attributeInserts = results[1].map(
@@ -221,23 +230,103 @@ export const fetchPageDataAsSqlDump = async (pageId, schemaName = 'default_schem
           row.component_id,
         )}, ${mysql.escape(row.attribute_key)}, ${mysql.escape(row.attribute_value)});`,
     )
+    console.log(`{fetchPageDataAsSqlDump} Attribute Inserts: ${JSON.stringify(attributeInserts)}`)
+
     const dumpText = [schemaCreation, tableCreation, ...componentInserts, ...attributeInserts].join(
-      ' ',
+      '\n',
     )
 
-    console.log(`SQL dump completed for page ID: ${pageId}`)
+    console.log(`{fetchPageDataAsSqlDump} SQL dump text: ${dumpText}`)
     // Write the SQL dump to a file
     const filePath = path.join(__dirname, `../dumps/${pageId}.sql`)
+    console.log(`{fetchPageDataAsSqlDump} File path for SQL dump: ${filePath}`)
 
     // Ensure the dumps directory exists
     ensureDirectoryExistence(filePath)
 
     fs.writeFileSync(filePath, dumpText, 'utf8')
+    console.log(`{fetchPageDataAsSqlDump} SQL dump written to file for page ID: ${pageId}`)
 
-    console.log(`SQL dump completed for page ID: ${pageId}`)
     return filePath
   } catch (error) {
-    console.error('Failed to generate SQL dump:', error)
+    console.error('{fetchPageDataAsSqlDump} Failed to generate SQL dump:', error)
     throw error
   }
 }
+// export const fetchPageDataAsSqlDump = async (pageId, schemaName = 'default_schema') => {
+//   const escapedPageId = mysql.escape(pageId)
+//   const schemaCreation = `CREATE DATABASE IF NOT EXISTS ${schemaName}; USE ${schemaName};`
+//   const tableCreation = `
+//     CREATE TABLE IF NOT EXISTS components (
+//       component_id INT AUTO_INCREMENT PRIMARY KEY,
+//       page_id VARCHAR(255)
+//     );
+//     CREATE TABLE IF NOT EXISTS component_attributes (
+//       component_id INT,
+//       attribute_key VARCHAR(255),
+//       attribute_value TEXT,
+//       PRIMARY KEY (component_id, attribute_key),
+//       FOREIGN KEY (component_id) REFERENCES components(component_id)
+//     );
+//   `.replace(/\n/g, ' ')
+
+//   // Add a query to fetch component data as well
+//   const queries = [
+//     `SELECT component_id, page_id FROM components WHERE page_id = ${escapedPageId}`,
+//     `SELECT component_id, attribute_key, attribute_value FROM component_attributes WHERE component_id IN (SELECT component_id FROM components WHERE page_id = ${escapedPageId})`,
+//   ]
+
+//   console.log(`Starting SQL dump for page ID: ${pageId}`)
+
+//   try {
+//     const results = await Promise.all(
+//       queries.map(
+//         query =>
+//           new Promise((resolve, reject) => {
+//             connection.query(query, (err, results) => {
+//               if (err) {
+//                 console.error(`Error executing query: ${query}`, err)
+//                 reject(err)
+//               } else {
+//                 resolve(results)
+//               }
+//             })
+//           }),
+//       ),
+//     )
+
+//     // Generate SQL insert statements for components first
+//     const componentInserts = results[0].map(
+//       row =>
+//         `INSERT INTO components (component_id, page_id) VALUES (${mysql.escape(
+//           row.component_id,
+//         )}, ${mysql.escape(row.page_id)});`,
+//     )
+
+//     // Generate SQL insert statements for component attributes
+//     const attributeInserts = results[1].map(
+//       row =>
+//         `INSERT INTO component_attributes (component_id, attribute_key, attribute_value) VALUES (${mysql.escape(
+//           row.component_id,
+//         )}, ${mysql.escape(row.attribute_key)}, ${mysql.escape(row.attribute_value)});`,
+//     )
+//     const dumpText = [schemaCreation, tableCreation, ...componentInserts, ...attributeInserts].join(
+//       ' ',
+//     )
+
+//     console.log(`SQL dump completed for page ID: ${pageId}`)
+//     // Write the SQL dump to a file
+//     const filePath = path.join(__dirname, `../dumps/${pageId}.sql`)
+
+//     // Ensure the dumps directory exists
+//     ensureDirectoryExistence(filePath)
+
+//     fs.writeFileSync(filePath, dumpText, 'utf8')
+
+//     console.log(`SQL dump completed for page ID: ${pageId}`)
+//     return filePath
+//   } catch (error) {
+//     console.error('Failed to generate SQL dump:', error)
+//     throw error
+//   }
+// }
