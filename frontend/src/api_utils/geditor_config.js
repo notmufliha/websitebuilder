@@ -4,8 +4,6 @@ import $ from "jquery";
 import grapesjsBlockBootstrap from "grapesjs-blocks-bootstrap4";
 import grapesjsPluginExport from "grapesjs-plugin-export";
 import grapesjsStyleBg from "grapesjs-style-bg";
-import customCodePlugin from "grapesjs-custom-code";
-
 import { API_HOST } from ".";
 import axios from "axios";
 import {
@@ -28,6 +26,7 @@ import chartLibComponent from "../plugins/charts";
 import swiperComponent2 from "../plugins/template";
 import customCodePlugin from 'grapesjs-custom-code';
 import sliderComponent from "../plugins/slider";
+import grapesjsloginform from '../plugins/login'
 
 function loadLastIdCounters() {
   const storedCounters = localStorage.getItem("idCounters");
@@ -190,7 +189,8 @@ const geditorConfig = (pageId, assets) => {
       chartLibComponent,
       swiperComponent2,
       sliderComponent,
-      customCodePlugin
+      customCodePlugin,
+      grapesjsloginform
     ],
     pluginsOpts: {
       tailwindComponent: {},
@@ -203,7 +203,8 @@ const geditorConfig = (pageId, assets) => {
       chartLibComponent: {},
       swiperComponent2: {},
       sliderComponent: {},
-      [customCodePlugin]: {}
+      [customCodePlugin]: {},
+      grapesjsloginform:{}
     },
   });
 
@@ -215,8 +216,7 @@ const geditorConfig = (pageId, assets) => {
       `Component of type ${type} added with custom ID set to ${customId}`
     );
     console.log(
-      `Post-set verification, Custom ID on component: ${
-        component.getAttributes().customId
+      `Post-set verification, Custom ID on component: ${component.getAttributes().customId
       }`
     );
   });
