@@ -1,0 +1,189 @@
+
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+                            <title>MMSM</title>
+                            <link rel="stylesheet" href="css/style_mmsm.css">
+                        </head>
+                        <body>
+                            <form customId="component_129" id="iec7" class="search-form"><div id="irnh" customId="component_2602" class="form-row"><select name="from" id="i5ti" customId="component_2603"><option value="" customId="component_2604">From</option><option value="NYC" customId="component_2605">New York</option><option value="LAX" customId="component_2606">Los Angeles</option></select><select name="to" id="iagzy" customId="component_2607"><option value="" customId="component_2608">To</option><option value="NYC" customId="component_2609">New York</option><option value="LAX" customId="component_2610">Los Angeles</option></select><input type="date" name="departure" id="iveip" customId="component_2611"/><input type="date" name="arrival" id="ixavq" customId="component_2612"/><select name="pax" id="i893n" customId="component_2613"><option value="1" customId="component_2614">1</option><option value="2" customId="component_2615">2</option><option value="3" customId="component_2616">3</option><option value="4" customId="component_2617">4</option></select><button id="ikkx9" customId="component_129">Search</button></div></form><script>var items = document.querySelectorAll('#iec7');
+          for (var i = 0, len = items.length; i < len; i++) {
+            (function(){
+const form = this;
+          let initialHighlightDone = false;
+          function changeTableContent(date) {
+            var companies = document.querySelectorAll('#content-table tr:not(:first-child) td:first-child');
+            companies.forEach(function (company, index) {
+              company.textContent = "New Company " + (index + 1);
+            });
+          }
+          form.onsubmit = function (e) {
+            e.preventDefault();
+            const from = form.querySelector('[name="from"]').value;
+            const to = form.querySelector('[name="to"]').value;
+            const departure = new Date(form.querySelector('[name="departure"]').value);
+            const arrival = new Date(form.querySelector('[name="arrival"]').value);
+            const pax = form.querySelector('[name="pax"]').value;
+            const styleTag = document.createElement('style');
+            styleTag.textContent = `
+                          table {
+                            font-family: arial, sans-serif;
+                            border-collapse: collapse;
+                            width: 100%;
+                          }
+                          td, th {
+                            border: 1px solid #dddddd;
+                            text-align: left;
+                            padding: 8px;
+                          }
+                          tr:nth-child(even) {
+                            background-color: #dddddd;
+                          }
+                          .date-table-container {
+                            width: 100%;
+                            overflow-x: auto;
+                          }
+                          .date-table {
+                            display: flex;
+                            border: 1px solid #dddddd;
+                            padding: 5px;
+                            justify-content: space-between;
+                          }
+                          .date-item {
+                            cursor: pointer;
+                            flex: 1;
+                            text-align: center;
+                          }
+                          .selected {
+                            background-color: lightblue;
+                          }
+                        `;
+
+            // Append style tag to the document head
+            document.head.appendChild(styleTag);
+            let departureDiv = document.querySelector('.date-table-container');
+            if (!departureDiv) {
+              departureDiv = document.createElement('div');
+              departureDiv.classList.add('date-table-container');
+              form.parentNode.appendChild(departureDiv);
+            }
+            departureDiv.innerHTML = `
+            <div class="date-table-container" id="dateTableContainer">
+              <div class="date-table" id="dateTable">
+                <!-- Date items will be dynamically inserted here -->
+              </div>
+            </div>
+            <table id="content-table">
+              <tr>
+                <th>Company</th>
+                <th>Contact</th>
+                <th>Country</th>
+              </tr>
+              <tr>
+                <td>Alfreds Futterkiste</td>
+                <td>Maria Anders</td>
+                <td>Germany</td>
+              </tr>
+              <tr>
+                <td>Centro comercial Moctezuma</td>
+                <td>Francisco Chang</td>
+                <td>Mexico</td>
+              </tr>
+              <tr>
+                <td>Ernst Handel</td>
+                <td>Roland Mendel</td>
+                <td>Austria</td>
+              </tr>
+              <tr>
+                <td>Island Trading</td>
+                <td>Helen Bennett</td>
+                <td>UK</td>
+              </tr>
+              <tr>
+                <td>Laughing Bacchus Winecellars</td>
+                <td>Yoshi Tannamuri</td>
+                <td>Canada</td>
+              </tr>
+              <tr>
+                <td>Magazzini Alimentari Riuniti</td>
+                <td>Giovanni Rovelli</td>
+                <td>Italy</td>
+              </tr>
+            </table>
+          `;
+            form.parentNode.appendChild(departureDiv);
+            let startIndex = 0;
+            let endIndex = 3; // Show 4 date items initially
+            let currentBaseDate = departure;
+            function getDatesRow(chosenDate) {
+              const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+              let dataItems = [];
+              for (let i = -3; i <= 3; i++) {
+                const date = new Date(chosenDate);
+                date.setDate(chosenDate.getDate() + i);
+                const formattedDate = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                dataItems.push(formattedDate);
+              }
+              return dataItems;
+            }
+            function renderDateItems(baseDate) {
+              var dateTable = document.getElementById("dateTable");
+              dateTable.innerHTML = ""; // Clear previous date items
+
+              let dateItems = getDatesRow(baseDate);
+              const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+              const formattedDepartureDate = `${months[departure.getMonth()]} ${departure.getDate()}, ${departure.getFullYear()}`;
+              for (let i = 0; i < dateItems.length; i++) {
+                let dateItem = document.createElement("div");
+                dateItem.className = "date-item";
+                dateItem.textContent = dateItems[i];
+                dateTable.appendChild(dateItem);
+
+                // Highlight the initially selected departure date only once
+                if (!initialHighlightDone && dateItems[i] === formattedDepartureDate) {
+                  dateItem.classList.add('selected');
+                  initialHighlightDone = true; // Set the flag to true after highlighting
+                }
+                // Add event listener to toggle highlighting and call changeTableContent
+                dateItem.addEventListener("click", function () {
+                  // Remove highlighting from previously selected date items
+                  let selectedDateItems = document.querySelectorAll('.date-item.selected');
+                  selectedDateItems.forEach(function (item) {
+                    item.classList.remove('selected');
+                  });
+
+                  // Add highlighting to the clicked date item
+                  this.classList.add('selected');
+
+                  // Call changeTableContent with the selected date
+                  changeTableContent(this.textContent);
+                });
+
+                // Add navigation to previous/next dates
+                if (i === 0) {
+                  dateItem.classList.add("nav-button");
+                  dateItem.addEventListener("click", loadPreviousDates);
+                } else if (i === dateItems.length - 1) {
+                  dateItem.classList.add("nav-button");
+                  dateItem.addEventListener("click", loadNextDates);
+                }
+              }
+            }
+            function loadPreviousDates() {
+              currentBaseDate.setDate(currentBaseDate.getDate() - 4);
+              renderDateItems(currentBaseDate);
+            }
+            function loadNextDates() {
+              currentBaseDate.setDate(currentBaseDate.getDate() + 4);
+              renderDateItems(currentBaseDate);
+            }
+            renderDateItems(currentBaseDate);
+          };
+}.bind(items[i]))();
+          }</script>
+                        </body>
+                    </html>
+                
