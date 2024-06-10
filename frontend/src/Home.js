@@ -65,21 +65,21 @@ const Home = () => {
 
   const handleExport = async () => {
     try {
-      const generateBackendResponse = await fetch(
-        'http://localhost:8080/api/generateAndSendBackend',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            /* Any necessary parameters */
-          })
-        }
-      )
-      if (!generateBackendResponse.ok) {
-        throw new Error('Error generating backend')
-      }
+      // const generateBackendResponse = await fetch(
+      //   'http://localhost:8080/api/generateAndSendBackend',
+      //   {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     },
+      //     body: JSON.stringify({
+      //       /* Any necessary parameters */
+      //     })
+      //   }
+      // )
+      // if (!generateBackendResponse.ok) {
+      //   throw new Error('Error generating backend')
+      // }
 
       const pageDataPromises = selectedPages.map(async pageId => {
         try {
@@ -132,7 +132,7 @@ const Home = () => {
             assets: cleanedAssets,
             pageId,
             name: data.name
-            //  sqlBlob
+            // sqlBlob
           }
         } catch (error) {
           console.error('Error fetching page data:', error)
@@ -153,31 +153,31 @@ const Home = () => {
       }
 
       // Create a new ZIP archive
-      const zipBlob = await generateBackendResponse.blob()
+      // const zipBlob = await generateBackendResponse.blob()
       const zip = new JSZip()
       // const sqlFolder = zip.folder('sql')
 
-      const zip2 = await JSZip.loadAsync(zipBlob)
+      // const zip2 = await JSZip.loadAsync(zipBlob)
 
       // Create a new folder called 'backend' if it doesn't exist
-      const backendFolder = zip.folder('backend') || zip.folder()
+      // const backendFolder = zip.folder('backend') || zip.folder()
 
-      const filesToRemove = [] // Store files to remove after iteration
+      // const filesToRemove = [] // Store files to remove after iteration
 
-      zip2.forEach((relativePath, file) => {
-        if (!file.dir) {
-          // Move files into the 'backend' folder
-          backendFolder.file(relativePath, file.async('blob'))
-          console.log(relativePath)
-          // Store the original file to remove later
-          filesToRemove.push(relativePath)
-        }
-      })
+      // zip2.forEach((relativePath, file) => {
+      //   if (!file.dir) {
+      //     // Move files into the 'backend' folder
+      //     backendFolder.file(relativePath, file.async('blob'))
+      //     console.log(relativePath)
+      //     // Store the original file to remove later
+      //     filesToRemove.push(relativePath)
+      //   }
+      // })
 
       // Remove the original files from the zip
-      filesToRemove.forEach(relativePath => {
-        delete zip.files[relativePath]
-      })
+      // filesToRemove.forEach(relativePath => {
+      //   delete zip.files[relativePath]
+      // })
 
       const frontendFolder = zip.folder('frontend')
 
@@ -220,28 +220,28 @@ const Home = () => {
 
       // Add the HTML and CSS for each page to the ZIP archive
       validPageData.forEach(({ html, css, assets, pageId, name }) => {
-        //   validPageData.forEach(({ html, css, assets, pageId, name, sqlBlob }) => {
+        // validPageData.forEach(({ html, css, assets, pageId, name, sqlBlob }) => {
         const htmlWithPlaceholders = createTemplatePlaceholders(html)
         console.log(htmlWithPlaceholders)
         if (html) {
           // Construct HTML content with proper structure
           const htmlContent = `
-                    <!DOCTYPE html>
-                    <html>
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
-                            <title>${name}</title>
-                            <link rel="stylesheet" href="css/style_${name
-                              .replace(/\s/g, '_')
-                              .toLowerCase()}.css">
-                        </head>
-                        <body>
-                            ${htmlWithPlaceholders}
-                        </body>
-                    </html>
-                `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+                    <title>${name}</title>
+                    <link rel="stylesheet" href="css/style_${name
+                      .replace(/\s/g, '_')
+                      .toLowerCase()}.css">
+                </head>
+                <body>
+                    ${htmlWithPlaceholders}
+                </body>
+            </html>
+          `
 
           // Add HTML file to the ZIP archive
           frontendFolder.file(`${name}.html`, htmlContent)
@@ -264,7 +264,7 @@ const Home = () => {
               .catch(error => console.error('Error fetching asset:', error))
           })
 
-          //  sqlFolder.file(`${pageId}.sql`, sqlBlob) // Add the SQL dump to the ZIP
+          // sqlFolder.file(`${pageId}.sql`, sqlBlob) // Add the SQL dump to the ZIP
         }
       })
 
@@ -726,10 +726,10 @@ main
                     Select
                   </th>
                   <th style={{ padding: '10px', border: '1px solid #ddd' }}>
-                    Name
+                    ID
                   </th>
                   <th style={{ padding: '10px', border: '1px solid #ddd' }}>
-                    Slug
+                    Name
                   </th>
                   <th style={{ padding: '10px', border: '1px solid #ddd' }}>
                     Action

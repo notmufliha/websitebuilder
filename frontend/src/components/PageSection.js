@@ -1,91 +1,93 @@
-import React, { useState, useReducer } from "react";
-import { useDispatch } from "react-redux";
-import { Modal, Button } from "react-bootstrap";
-import { createPage } from "../redux/actions/pageAction";
-import PageDetail from "./PageDetail";
+import React, { useState, useReducer } from 'react'
+import { useDispatch } from 'react-redux'
+import { Modal, Button } from 'react-bootstrap'
+import { createPage } from '../redux/actions/pageAction'
+import PageDetail from './PageDetail'
 
-export default function PageSection({ pages }) {
-  const [show, setShow] = useReducer((show) => !show, false);
-  const [name, setName] = useState("");
-  const [isValid, setIsValid] = useState(true);
-  const [error, setError] = useState("");
+export default function PageSection ({ pages }) {
+  const [show, setShow] = useReducer(show => !show, false)
+  const [name, setName] = useState('')
+  const [isValid, setIsValid] = useState(true)
+  const [error, setError] = useState('')
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const handleSubmit = async () => {
     if (!name) {
-      setIsValid(false);
-      return;
+      setIsValid(false)
+      return
     } else {
-      createPage(name)(dispatch);
-      closeModal();
+      createPage(name)(dispatch)
+      closeModal()
     }
-  };
+  }
 
   const closeModal = () => {
-    setName("");
-    setError("");
-    setShow();
-  };
+    setName('')
+    setError('')
+    setShow()
+  }
   return (
-    <div className="my-2 d-flex flex-column">
+    <div className='my-2 d-flex flex-column'>
       <button
-        type="button"
-        className="btn btn-outline-secondary btn-sm mb-2 mx-2"
+        type='button'
+        className='btn btn-outline-secondary btn-sm mb-2 mx-2'
         onClick={() => setShow(!show)}
       >
-        <i className="fa fa-plus"></i>
+        <i className='fa fa-plus'></i>
         Add Page
       </button>
-      <form id="create-page">
+      <form id='create-page'>
         <Modal
           show={show}
           onHide={setShow}
-          backdrop="static"
+          backdrop='static'
           keyboard={false}
-          aria-labelledby="contained-modal-title-vcenter"
+          aria-labelledby='contained-modal-title-vcenter'
           centered
         >
           <Modal.Header closeButton>
             <Modal.Title>Create Page</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <div className="col-auto">
-              <label htmlFor="name" className="form-label">
+            <div className='col-auto'>
+              <label htmlFor='name' className='form-label'>
                 Name
               </label>
               <input
-                type="text"
-                className={`form-control form-control-sm ${isValid ? "" : "is-invalid"
-                  }`}
-                id="name"
-                name="name"
-                placeholder="Name of Page"
+                type='text'
+                autocomplete='off'
+                className={`form-control form-control-sm ${
+                  isValid ? '' : 'is-invalid'
+                }`}
+                id='name'
+                name='name'
+                placeholder='Name of Page'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
               />
               {!isValid && (
-                <div className="invalid-feedback">
+                <div className='invalid-feedback'>
                   Please provide a valid name.
                 </div>
               )}
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={closeModal}>
+            <Button variant='secondary' onClick={closeModal}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleSubmit}>
+            <Button variant='primary' onClick={handleSubmit}>
               Save Changes
             </Button>
           </Modal.Footer>
         </Modal>
       </form>
-      <ul className="list-group pages" style={{ height: '200px' }}>
-        {pages.map((page) => (
+      <ul className='list-group pages' style={{ height: '200px' }}>
+        {pages.map(page => (
           <PageDetail page={page} key={page._id} />
         ))}
       </ul>
     </div>
-  );
+  )
 }

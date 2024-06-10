@@ -1,0 +1,111 @@
+
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+                    <title>1</title>
+                    <link rel="stylesheet" href="css/style_1.css">
+                </head>
+                <body>
+                    <div data-gjs="navbar" customId="component_698" class="navbar"><div customId="component_699" class="navbar-container"><a href="/" customId="link_265" class="navbar-brand"></a><div customId="component_161" id="i0s4" class="navbar-burger"><div customId="component_700" class="navbar-burger-line"></div><div customId="component_701" class="navbar-burger-line"></div><div customId="component_702" class="navbar-burger-line"></div></div><div data-gjs="navbar-items" customId="component_703" class="navbar-items-c"><nav data-gjs="navbar-menu" customId="component_704" class="navbar-menu"><a href="/2.html" customId="link_266" class="navbar-menu-link">Travel Info</a><a href="/schedule" customId="link_267" class="navbar-menu-link">Schedule</a><a href="/booking" customId="link_268" class="navbar-menu-link">Booking</a><a href="/contact" customId="link_269" class="navbar-menu-link">Contact</a></nav></div></div></div><script>var items = document.querySelectorAll('#i0s4');
+          for (var i = 0, len = items.length; i < len; i++) {
+            (function(){
+var transEndAdded;
+          var isAnimating = 0;
+          var stringCollapse = 'gjs-collapse';
+          var clickEvent = 'click';
+          var transitProp = 'max-height';
+          var transitTiming = 'ease-in-out';
+          var transitSpeed = 0.25;
+          var getTransitionEvent = function () {
+            var t,
+              el = document.createElement('void');
+            var transitions = {
+              transition: 'transitionend',
+              OTransition: 'oTransitionEnd',
+              MozTransition: 'transitionend',
+              WebkitTransition: 'webkitTransitionEnd'
+            };
+            for (t in transitions) {
+              if (el.style[t] !== undefined) {
+                return transitions[t];
+              }
+            }
+          };
+          var transitEndEvent = getTransitionEvent();
+          var getElHeight = function (el) {
+            var style = window.getComputedStyle(el);
+            var elDisplay = style.display;
+            var elPos = style.position;
+            var elVis = style.visibility;
+            var currentHeight = style.height;
+            var elMaxHeight = parseInt(style[transitProp]);
+            if (elDisplay !== 'none' && elMaxHeight !== '0') {
+              return el.offsetHeight;
+            }
+            el.style.height = 'auto';
+            el.style.display = 'block';
+            el.style.position = 'absolute';
+            el.style.visibility = 'hidden';
+            var height = el.offsetHeight;
+            el.style.height = '';
+            el.style.display = '';
+            el.style.position = '';
+            el.style.visibility = '';
+            return height;
+          };
+          var toggleSlide = function (el) {
+            isAnimating = 1;
+            var elMaxHeight = getElHeight(el);
+            var elStyle = el.style;
+            elStyle.display = 'block';
+            elStyle.transition = transitProp + ' ' + transitSpeed + 's ' + transitTiming;
+            elStyle.overflowY = 'hidden';
+            if (elStyle[transitProp] == '') {
+              elStyle[transitProp] = 0;
+            }
+            if (parseInt(elStyle[transitProp]) == 0) {
+              elStyle[transitProp] = '0';
+              setTimeout(function () {
+                elStyle[transitProp] = elMaxHeight + 'px';
+              }, 10);
+            } else {
+              elStyle[transitProp] = '0';
+            }
+          };
+          var toggle = function (e) {
+            e.preventDefault();
+            if (isAnimating) {
+              return;
+            }
+            console.log(`Toggle called on: ${this}`);
+            var navParent = this.closest(`[data-gjs=navbar]`);
+            console.log(`Navbar parent found: ${navParent}`);
+            var navItemsSelector = `[data-gjs=navbar-items]`;
+            console.log(`Navbar items selector: ${navItemsSelector}`);
+            var navItems = navParent.querySelector(navItemsSelector);
+            console.log(`Navbar items found: ${navItems}`);
+            toggleSlide(navItems);
+            if (!transEndAdded) {
+              navItems.addEventListener(transitEndEvent, function () {
+                isAnimating = 0;
+                var itemsStyle = navItems.style;
+                if (parseInt(itemsStyle[transitProp]) == 0) {
+                  itemsStyle.display = '';
+                  itemsStyle[transitProp] = '';
+                }
+              });
+              transEndAdded = 1;
+            }
+          };
+          if (!(stringCollapse in this)) {
+            this.addEventListener(clickEvent, toggle);
+          }
+          this[stringCollapse] = 1;
+}.bind(items[i]))();
+          }</script>
+                </body>
+            </html>
+          

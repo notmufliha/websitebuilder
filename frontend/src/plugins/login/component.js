@@ -245,7 +245,7 @@ export default (editor, opts = {}) => {
                           .selected {
                             background-color: lightblue;
                           }
-                        `;
+                        `
 
             // Append style tag to the document head
             document.head.appendChild(styleTag);

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-anonymous-default-export */
 export default (editor, opts = {}) => {
-    const bm = editor.BlockManager;
-    const style = `<style>
+  const bm = editor.BlockManager
+  const style = `<style>
     box-sizing: border-box;
   }
   body {
@@ -487,10 +487,10 @@ export default (editor, opts = {}) => {
       display:none;
     }
     </style>
-    `;
-    bm.add(opts.name, {
-      category: opts.category,
-      content: `
+    `
+  bm.add(opts.name, {
+    category: opts.category,
+    content: `
       <div data-gjs-type="cswiper2">
       <header id="ixbn" class="header-banner" data-gjs-type="cswiper2">
       <div id="ihn8" class="container-width">
@@ -784,8 +784,8 @@ export default (editor, opts = {}) => {
               </div>
               <div class="foot-form-desc">Subscribe to our newsletter to receive exclusive offers and the latest news
               </div>
-              <input type="text" name="name" placeholder="Name" class="sub-input"/>
-              <input type="text" name="email" placeholder="Email" class="sub-input"/>
+              <input type="text" name="name" placeholder="Name" autocomplete="off" class="sub-input"/>
+              <input type="text" name="email" placeholder="Email" autocomplete="off" class="sub-input"/>
               <button type="button" class="sub-btn">Submit</button>
             </div>
           </div>
@@ -803,7 +803,6 @@ export default (editor, opts = {}) => {
         </div>
       </div>
     </footer>
-    </div>${style}`,
-    });
-  };
-  
+    </div>${style}`
+  })
+}

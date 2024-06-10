@@ -17,16 +17,17 @@ import {
   styleManager,
   styles,
   toggleSidebar,
-  traitManager,
-} from "./geditor_utils";
-import tailwindComponent from "../plugins/tailwind";
-import swiperComponent from "../plugins/swiper";
-import gjsnavbar from "../plugins/navbar";
-import chartLibComponent from "../plugins/charts";
-import swiperComponent2 from "../plugins/template";
-import customCodePlugin from 'grapesjs-custom-code';
-import sliderComponent from "../plugins/slider";
+  traitManager
+} from './geditor_utils'
+import tailwindComponent from '../plugins/tailwind'
+import swiperComponent from '../plugins/swiper'
+import gjsnavbar from '../plugins/navbar'
+import chartLibComponent from '../plugins/charts'
+import swiperComponent2 from '../plugins/template'
+import customCodePlugin from 'grapesjs-custom-code'
+import sliderComponent from '../plugins/slider'
 import grapesjsloginform from '../plugins/login'
+import grapesjsbookingform from '../plugins/booking'
 
 function loadLastIdCounters () {
   const storedCounters = localStorage.getItem('idCounters')
@@ -108,12 +109,8 @@ const geditorConfig = (pageId, assets) => {
   const panelTopBar = $('#main-content > .navbar-light')
 
   const editor = grapesjs.init({
-<<<<<<< Updated upstream
-    container: '#editor',
-=======
     allowScripts: 1,
-    container: "#editor",
->>>>>>> Stashed changes
+    container: '#editor',
     blockManager: {
       appendTo: '#blocks'
     },
@@ -184,6 +181,7 @@ const geditorConfig = (pageId, assets) => {
       scripts: scripts
     },
     plugins: [
+      grapesjsbookingform,
       tailwindComponent,
       gjsnavbar,
       gjsBlockBasic,
@@ -198,6 +196,7 @@ const geditorConfig = (pageId, assets) => {
       grapesjsloginform
     ],
     pluginsOpts: {
+      grapesjsbookingform: {},
       tailwindComponent: {},
       gjsnavbar: {},
       gjsBlockBasic: {},
@@ -209,7 +208,7 @@ const geditorConfig = (pageId, assets) => {
       swiperComponent2: {},
       sliderComponent: {},
       [customCodePlugin]: {},
-      grapesjsloginform:{}
+      grapesjsloginform: {}
     },
     allowScripts: true
   })
@@ -222,7 +221,8 @@ const geditorConfig = (pageId, assets) => {
       `Component of type ${type} added with custom ID set to ${customId}`
     )
     console.log(
-      `Post-set verification, Custom ID on component: ${component.getAttributes().customId
+      `Post-set verification, Custom ID on component: ${
+        component.getAttributes().customId
       }`
     )
   })
