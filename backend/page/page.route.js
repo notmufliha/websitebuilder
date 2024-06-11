@@ -54,7 +54,6 @@ pageRoute.post('/test', async (req, res) => {
     if (!files || files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded.' })
     }
-    console.log('here1')
     // Connect to the VM via SSH
     const sshConfig = {
       host: process.env.VM_IP,
@@ -62,7 +61,6 @@ pageRoute.post('/test', async (req, res) => {
       username: process.env.VM_USER,
       password: process.env.VM_PASSWORD,
     }
-    console.log('here2')
     const sshClient = new Client()
 
     await new Promise((resolve, reject) => {
@@ -74,14 +72,11 @@ pageRoute.post('/test', async (req, res) => {
     // Process each file in the array
     for (const file of files) {
       const { name, content } = file
-      console.log(name, content)
       // Save the file to a temporary directory
       const tempFilePath = path.join(__dirname, 'temp', name)
-      console.log(tempFilePath)
       fs.writeFileSync(tempFilePath, content)
 
       // Send the file to the VM using SCP
-      console.log('here4')
 
       let remoteDirectoryPath = name.endsWith('.css')
         ? 'wordpress_website/css'

@@ -43,57 +43,71 @@ export default (editor, opts = {}) => {
                 classes: ["form-row"],
                 components: [
                   {
-                    tagName: "select",
-                    attributes: { id: "select1", name: "from" },
-                    style: { width: "150px", "margin-right": "10px" },
+                    tagName: "div", // Enclosing div
+                    style: { "margin-right": "10px !important" },
                     components: [
                       {
-                        tagName: "option",
-                        attributes: { value: "" },
-                        components: "From",
-                      },
-                      {
-                        tagName: "option",
-                        attributes: { value: "NYC" },
-                        components: "New York",
-                      },
-                      {
-                        tagName: "option",
-                        attributes: { value: "LAX" },
-                        components: "Los Angeles",
+                        tagName: "select",
+                        attributes: { id: "select1", name: "from", required: true },
+                        style: { width: "150px", "margin-right": "10px !important" },
+                        components: [
+                          {
+                            tagName: "option",
+                            attributes: { value: "" },
+                            components: "From",
+                          },
+                          {
+                            tagName: "option",
+                            attributes: { value: "NYC" },
+                            components: "New York",
+                          },
+                          {
+                            tagName: "option",
+                            attributes: { value: "LAX" },
+                            components: "Los Angeles",
+                          },
+                        ],
+
                       },
                     ],
                   },
                   {
-                    tagName: "select",
-                    attributes: { id: "select2", name: "to" },
-                    style: { width: "150px", "margin-right": "10px" },
+                    tagName: "div", // Enclosing div
+                    style: { "margin-right": "10px !important" },
                     components: [
                       {
-                        tagName: "option",
-                        attributes: { value: "" },
-                        components: "To",
-                      },
-                      {
-                        tagName: "option",
-                        attributes: { value: "NYC" },
-                        components: "New York",
-                      },
-                      {
-                        tagName: "option",
-                        attributes: { value: "LAX" },
-                        components: "Los Angeles",
+                        tagName: "select",
+                        attributes: { id: "select2", name: "to", required: true },
+                        style: { width: "150px", "margin-right": "10px !important" },
+                        components: [
+                          {
+                            tagName: "option",
+                            attributes: { value: "" },
+                            components: "To",
+                          },
+                          {
+                            tagName: "option",
+                            attributes: { value: "NYC" },
+                            components: "New York",
+                          },
+                          {
+                            tagName: "option",
+                            attributes: { value: "LAX" },
+                            components: "Los Angeles",
+                          },
+                        ],
+
                       },
                     ],
                   },
                   {
                     tagName: "input",
-                    attributes: { type: "date", name: "departure" },
+                    attributes: { type: "text", name: "departure", required: true },
                     style: { width: "150px", "margin-right": "10px" },
                   },
                   {
                     tagName: "input",
-                    attributes: { type: "date", name: "arrival" },
+                    attributes: { type: "text", name: "arrival", required: true },
                     style: { width: "150px", "margin-right": "10px" },
                   },
                   {
@@ -142,226 +156,190 @@ export default (editor, opts = {}) => {
         script: function () {
           const form = this;
           let initialHighlightDone = false;
-          async function changeTableContent(chosenDate) {
+          async function changeTableContent(chosenDate, from, to) {
             try {
-              // Fetch data from the text file
               const response = await fetch("http://localhost:8080/data");
-              const text = await response.text();
-              const dummyData = JSON.parse(text);
+              const dummyData = await response.json(); // Parse JSON directly
 
-              // Find the departure table
               const departureTable = document.getElementById("content-table");
-              const trElement = departureTable.querySelector("tr");
-              const date = trElement.dataset.date;
-              console.log(trElement);
-              console.log(date); // outputs: "June 11, 2024"
-              console.log(departureTable);
-              for (let i = 1; i < departureTable.rows.length; i++) {
+
+              // Remove existing rows not matching chosenDate
+              for (let i = departureTable.rows.length - 1; i > 0; i--) {
                 const row = departureTable.rows[i];
-                console.log(row.getAttribute("data-date"));
-                if (row.getAttribute("data-date") != chosenDate) {
+                if (row.getAttribute("data-date") !== chosenDate) {
                   row.remove();
                 }
               }
 
-              // Loop through the dummy data to add new rows for the chosen date
-              dummyData.forEach((data) => {
-                console.log(data.date);
-                // Check if the date attribute matches the chosen date
-                // Function to check if a row with the same data-date already exists
-                function rowExists(date) {
-                  const rows = document.querySelectorAll(
-                    `tr[data-date="${date}"]`
-                  );
-                  return rows.length > 0;
-                }
+              // Check if a row with the same data already exists
+              let rowExists = false;
+              departureTable.querySelectorAll('tr[data-date="' + chosenDate + '"]').forEach(existingRow => {
+                const departure = existingRow.querySelector('td:nth-child(2)').textContent.trim();
+                const arrival = existingRow.querySelector('td:nth-child(3)').textContent.trim();
+                dummyData.forEach(data => {
+                  if (data.date === chosenDate && data.from === from && data.to === to &&
+                    data.departure === departure && data.arrival === arrival) {
+                    rowExists = true;
+                    return;
+                  }
+                });
+              });
 
-                if (data.date === chosenDate) {
-                  // Check if a row with the chosen date already exists
-                  if (!rowExists(chosenDate)) {
-                    // Create a new row for the data
+              // If the row doesn't exist, add it to the table
+              if (!rowExists) {
+                dummyData.forEach(data => {
+                  if (data.date === chosenDate && data.from === from && data.to === to) {
                     const newRow = `
-          <tr data-date="${chosenDate}">
-              <td>${data.trainService}</td>
-              <td>${data.departure}</td>
-              <td>${data.arrival}</td>
-              <td>${data.duration}</td>
-              <td>${data.availableSeats}</td>
-              <td>${data.minFare}</td>
-          </tr>
-      `;
-                    // Append the new row to the table
+              <tr data-date="${chosenDate}">
+                <td>${data.trainService}</td>
+                <td>${data.departure}</td>
+                <td>${data.arrival}</td>
+                <td>${data.duration}</td>
+                <td>${data.availableSeats}</td>
+                <td>${data.minFare}</td>
+                <td><button class="book-ticket">Book Ticket</button></td>
+              </tr>
+            `;
                     departureTable.innerHTML += newRow;
                   }
-                }
-              });
+                });
+              }
+
+              addBookTicketEventListeners();
             } catch (error) {
               console.error("Error loading data:", error);
             }
           }
 
+          function addBookTicketEventListeners() {
+            const bookTicketButtons = document.querySelectorAll('.book-ticket');
+            bookTicketButtons.forEach(button => {
+              button.addEventListener('click', function () {
+                const row = this.closest('tr');
+                const rowData = {
+                  trainService: row.cells[0].textContent,
+                  departure: row.cells[1].textContent,
+                  arrival: row.cells[2].textContent,
+                  duration: row.cells[3].textContent,
+                  availableSeats: row.cells[4].textContent,
+                  minFare: row.cells[5].textContent
+                };
+                localStorage.setItem('selectedTicket', JSON.stringify(rowData));
+                window.location.href = 'smth.html';
+              });
+            });
+          }
           form.onsubmit = function (e) {
             e.preventDefault();
-
             const from = form.querySelector('[name="from"]').value;
             const to = form.querySelector('[name="to"]').value;
-            const departure = new Date(
-              form.querySelector('[name="departure"]').value
-            );
-            const arrival = new Date(
-              form.querySelector('[name="arrival"]').value
-            );
+            console.log(form.querySelector('[name="departure"]').value)
+            const departure = new Date(form.querySelector('[name="departure"]').value);
+            console.log(departure)
+            const arrival = new Date(form.querySelector('[name="arrival"]').value);
             const pax = form.querySelector('[name="pax"]').value;
             const styleTag = document.createElement("style");
             styleTag.textContent = `
-                          table {
-                            font-family: arial, sans-serif;
-                            border-collapse: collapse;
-                            width: 100%;
-                          }
-                          td, th {
-                            border: 1px solid #dddddd;
-                            text-align: left;
-                            padding: 8px;
-                          }
-                          tr:nth-child(even) {
-                            background-color: #dddddd;
-                          }
-                          .date-table-container {
-                            width: 100%;
-                            overflow-x: auto;
-                          }
-                          .date-table {
-                            display: flex;
-                            border: 1px solid #dddddd;
-                            padding: 5px;
-                            justify-content: space-between;
-                          }
-                          .date-item {
-                            cursor: pointer;
-                            flex: 1;
-                            text-align: center;
-                          }
-                          .selected {
-                            background-color: lightblue;
-                          }
-                        `;
-
-            // Append style tag to the document head
+                table {
+                  font-family: arial, sans-serif;
+                  border-collapse: collapse;
+                  width: 100%;
+                }
+                td, th {
+                  border: 1px solid #dddddd;
+                  text-align: left;
+                  padding: 8px;
+                }
+                tr:nth-child(even) {
+                  background-color: #dddddd;
+                }
+                .date-table-container {
+                  width: 100%;
+                  overflow-x: auto;
+                }
+                .date-table {
+                  display: flex;
+                  border: 1px solid #dddddd;
+                  padding: 5px;
+                  justify-content: space-between;
+                }
+                .date-item {
+                  cursor: pointer;
+                  flex: 1;
+                  text-align: center;
+                }
+                .selected {
+                  background-color: lightblue;
+                }
+              `;
             document.head.appendChild(styleTag);
             var studentDiv = document.querySelector("div.divstudent");
-            let departureDiv = document.querySelector(".date-table-container");
-
-            // Check if departureDiv already exists
-            if (!departureDiv) {
+            var departureDiv = document.querySelector(".date-table-container");
+            if (!studentDiv.querySelector(".date-table-container")) {
               departureDiv = document.createElement("div");
               departureDiv.classList.add("date-table-container");
-
-              // Set inner HTML only if departureDiv is newly created
               departureDiv.innerHTML = `
-                    <div class="date-table-container" id="dateTableContainer">
-                        <div class="date-table" id="dateTable">
-                            <h3 style={{margin-top:50px}}>Departure</h3>
-                            <!-- Date items will be dynamically inserted here -->
-                        </div>
+                  <div class="date-table-container" id="dateTableContainer">
+                    <div id='dataHeader' style="text-align: center;">
+                      <h1 style="text-align: center;">${from} to ${to}</h1>
                     </div>
-                    <table id="content-table">
-                        <tr>
-                            <th>Train service</th>
-                            <th>Departure</th>
-                            <th>Arrival</th>
-                            <th>Duration</th>
-                            <th>Available seats</th>
-                            <th>Min. fare</th>
-                        </tr>
-                    </table>
+                    <div class="date-table" id="dateTable">
+                    </div>
+                  </div>
+                  <table id="content-table">
+                    <tr>
+                      <th>Train service</th>
+                      <th>Departure</th>
+                      <th>Arrival</th>
+                      <th>Duration</th>
+                      <th>Available seats</th>
+                      <th>Min. fare</th>
+                    </tr>
+                  </table>
                 `;
-              studentDiv.insertAdjacentHTML("afterend", departureDiv.outerHTML);
+              studentDiv.appendChild(departureDiv);
+            } else {
+              const previousFrom = departureDiv.querySelector('h1').innerText.split(' to ')[0];
+              const previousTo = departureDiv.querySelector('h1').innerText.split(' to ')[1];
+              if (previousFrom !== from || previousTo !== to) {
+                departureDiv.querySelector('h1').innerText = `${from} to ${to}`;
+              }
             }
-
-            let startIndex = 0;
-            let endIndex = 3; // Show 4 date items initially
             let currentBaseDate = departure;
-
             function getDatesRow(chosenDate) {
-              const months = [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ];
+              const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
               let dataItems = [];
               for (let i = -3; i <= 3; i++) {
                 const date = new Date(chosenDate);
                 date.setDate(chosenDate.getDate() + i);
-                const formattedDate = `${
-                  months[date.getMonth()]
-                } ${date.getDate()}, ${date.getFullYear()}`;
+                const formattedDate = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
                 dataItems.push(formattedDate);
               }
               return dataItems;
             }
-
             function renderDateItems(baseDate) {
               var dateTable = document.getElementById("dateTable");
-              dateTable.innerHTML = ""; // Clear previous date items
-
+              dateTable.innerHTML = "";
               let dateItems = getDatesRow(baseDate);
-
-              const months = [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ];
-              const formattedDepartureDate = `${
-                months[departure.getMonth()]
-              } ${departure.getDate()}, ${departure.getFullYear()}`;
+              const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+              const formattedDepartureDate = `${months[departure.getMonth()]} ${departure.getDate()}, ${departure.getFullYear()}`;
               for (let i = 0; i < dateItems.length; i++) {
                 let dateItem = document.createElement("div");
                 dateItem.className = "date-item";
                 dateItem.textContent = dateItems[i];
                 dateTable.appendChild(dateItem);
-
-                // Highlight the initially selected departure date only once
                 if (dateItems[i] === formattedDepartureDate) {
-                  changeTableContent(dateItem.textContent);
+                  changeTableContent(dateItem.textContent, from, to);
                   dateItem.classList.add("selected");
                 }
-                // Add event listener to toggle highlighting and call changeTableContent
                 dateItem.addEventListener("click", function () {
-                  // Remove highlighting from previously selected date items
-                  let selectedDateItems = document.querySelectorAll(
-                    ".date-item.selected"
-                  );
+                  let selectedDateItems = document.querySelectorAll(".date-item.selected");
                   selectedDateItems.forEach(function (item) {
                     item.classList.remove("selected");
                   });
-
-                  // Add highlighting to the clicked date item
                   this.classList.add("selected");
-
-                  // Call changeTableContent with the selected date
-                  changeTableContent(this.textContent);
+                  changeTableContent(this.textContent, from, to);
                 });
-
-                // Add navigation to previous/next dates
                 if (i === 0) {
                   dateItem.classList.add("nav-button");
                   dateItem.addEventListener("click", loadPreviousDates);
@@ -371,17 +349,14 @@ export default (editor, opts = {}) => {
                 }
               }
             }
-
             function loadPreviousDates() {
               currentBaseDate.setDate(currentBaseDate.getDate() - 4);
               renderDateItems(currentBaseDate);
             }
-
             function loadNextDates() {
               currentBaseDate.setDate(currentBaseDate.getDate() + 4);
               renderDateItems(currentBaseDate);
             }
-
             renderDateItems(currentBaseDate);
           };
         },

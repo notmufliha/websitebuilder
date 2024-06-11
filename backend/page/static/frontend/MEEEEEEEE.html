@@ -1,0 +1,51 @@
+
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+                            <title>MEEEEEEEE</title>
+                            <link rel="stylesheet" href="css/style_meeeeeeee.css">
+                        </head>
+                        <body>
+                            <div customId="component_107" id="i1g9" class="swiper-container mySwiper"><div customId="component_3546" class="swiper-wrapper"><div customId="textfield_4142" class="swiper-slide">Slide 1</div><div customId="textfield_4143" class="swiper-slide">Slide 2</div><div customId="textfield_4144" class="swiper-slide">Slide 3</div><div customId="textfield_4145" class="swiper-slide">Slide 4</div><div customId="textfield_4146" class="swiper-slide">Slide 5</div></div><div customId="component_3547" class="swiper-button-next"></div><div customId="component_3548" class="swiper-button-prev"></div><div customId="component_3549" class="swiper-pagination"></div></div> 
+  <script>var items = document.querySelectorAll('#i1g9');
+          for (var i = 0, len = items.length; i < len; i++) {
+            (function(){
+const dynamicProgress = "";
+          const progressType = "";
+          const initLib = function () {
+            const swiper = new Swiper(".mySwiper", {
+              spaceBetween: 30,
+              centeredSlides: true,
+              autoplay: {
+                delay: 2500,
+                disableOnInteraction: false
+              },
+              pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                dynamicBullets: !!dynamicProgress,
+                type: progressType
+              },
+              navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev"
+              }
+            });
+            console.log("swiper :>> ", swiper);
+          };
+          if (typeof Swiper == "undefined") {
+            const script = document.createElement("script");
+            script.onload = initLib;
+            script.src = "https://unpkg.com/swiper@7/swiper-bundle.min.js";
+            document.body.appendChild(script);
+          } else {
+            initLib();
+          }
+}.bind(items[i]))();
+          }</script>
+                        </body>
+                    </html>
+                
