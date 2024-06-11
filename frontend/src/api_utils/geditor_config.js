@@ -28,6 +28,7 @@ import customCodePlugin from 'grapesjs-custom-code';
 import tabs from 'grapesjs-tabs'
 import sliderComponent from "../plugins/slider";
 import grapesjsloginform from '../plugins/login'
+import grapesjsbookingform from '../plugins/booking'
 
 function loadLastIdCounters() {
   const storedCounters = localStorage.getItem('idCounters')
@@ -180,6 +181,7 @@ const geditorConfig = (pageId, assets) => {
       scripts: scripts
     },
     plugins: [
+      grapesjsbookingform,
       tailwindComponent,
       gjsnavbar,
       gjsBlockBasic,
@@ -195,6 +197,7 @@ const geditorConfig = (pageId, assets) => {
       tabs
     ],
     pluginsOpts: {
+      grapesjsbookingform: {},
       tailwindComponent: {},
       gjsnavbar: {},
       gjsBlockBasic: {},
@@ -220,7 +223,8 @@ const geditorConfig = (pageId, assets) => {
       `Component of type ${type} added with custom ID set to ${customId}`
     )
     console.log(
-      `Post-set verification, Custom ID on component: ${component.getAttributes().customId
+      `Post-set verification, Custom ID on component: ${
+        component.getAttributes().customId
       }`
     )
   })
