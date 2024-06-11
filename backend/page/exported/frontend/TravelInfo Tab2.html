@@ -1,0 +1,223 @@
+
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+                            <title>TravelInfo Tab2</title>
+                            <link rel="stylesheet" href="css/style_travelinfo_tab2.css">
+                        </head>
+                        <body>
+                            <div class="divstudent" customId="component_139" id="izhf"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" customId="component_3397"/><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" customId="component_3398"></script><script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" customId="component_3399"></script><script customId="component_3400">$(document).ready(function () {
+              $("#select1, #select2").select2();
+            });</script><form customId="component_3401" class="search-form"></form></div><div customId="component_143" id="i1ui" class="divstudent"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" customId="component_3550"/><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" customId="component_3551"></script><script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" customId="component_3552"></script><script customId="component_3553">$(document).ready(function () {
+              $("#select1, #select2").select2();
+            });</script><form customId="component_3554" class="search-form"><div id="imupg" customId="component_3555" class="form-row"><div id="il2dh" customId="component_3556"><select id="select1" name="from" required customId="component_3557"><option value="" customId="component_3558">From</option><option value="NYC" customId="component_3559">New York</option><option value="LAX" customId="component_3560">Los Angeles</option></select></div><div id="id8a9" customId="component_3561"><select id="select2" name="to" required customId="component_3562"><option value="" customId="component_3563">To</option><option value="NYC" customId="component_3564">New York</option><option value="LAX" customId="component_3565">Los Angeles</option></select></div><input type="date" name="departure" required id="iyc26" customId="component_3566"/><input type="date" name="arrival" required id="iw8pe" customId="component_3567"/><select name="pax" id="iwgev" customId="component_3568"><option value="1" customId="component_3569">1</option><option value="2" customId="component_3570">2</option><option value="3" customId="component_3571">3</option><option value="4" customId="component_3572">4</option></select><button id="ina43" customId="component_142">Search</button></div></form></div><script>var items = document.querySelectorAll('#izhf, #i1ui');
+          for (var i = 0, len = items.length; i < len; i++) {
+            (function(){
+const form = this;
+          let initialHighlightDone = false;
+          async function changeTableContent(chosenDate) {
+            try {
+              // Fetch data from the text file
+              const response = await fetch("http://localhost:8080/data");
+              const text = await response.text();
+              const dummyData = JSON.parse(text);
+
+              // Find the departure table
+              const departureTable = document.getElementById("content-table");
+              for (let i = 1; i < departureTable.rows.length; i++) {
+                const row = departureTable.rows[i];
+                console.log(row.getAttribute("data-date"));
+                if (row.getAttribute("data-date") != chosenDate) {
+                  row.remove();
+                }
+              }
+
+              // Loop through the dummy data to add new rows for the chosen date
+              dummyData.forEach(data => {
+                console.log(data.date);
+                // Check if the date attribute matches the chosen date
+                // Function to check if a row with the same data-date already exists
+                function rowExists(date) {
+                  const rows = document.querySelectorAll(`tr[data-date="${date}"]`);
+                  return rows.length > 0;
+                }
+                if (data.date === chosenDate) {
+                  // Check if a row with the chosen date already exists
+                  if (!rowExists(chosenDate)) {
+                    // Create a new row for the data
+                    const newRow = `
+          <tr data-date="${chosenDate}">
+              <td>${data.trainService}</td>
+              <td>${data.departure}</td>
+              <td>${data.arrival}</td>
+              <td>${data.duration}</td>
+              <td>${data.availableSeats}</td>
+              <td>${data.minFare}</td>
+          </tr>
+      `;
+                    // Append the new row to the table
+                    departureTable.innerHTML += newRow;
+                  }
+                }
+              });
+            } catch (error) {
+              console.error("Error loading data:", error);
+            }
+          }
+          form.onsubmit = function (e) {
+            e.preventDefault();
+            const from = form.querySelector('[name="from"]').value;
+            const to = form.querySelector('[name="to"]').value;
+            const departure = new Date(form.querySelector('[name="departure"]').value);
+            const arrival = new Date(form.querySelector('[name="arrival"]').value);
+            const pax = form.querySelector('[name="pax"]').value;
+            const styleTag = document.createElement("style");
+            styleTag.textContent = `
+                          table {
+                            font-family: arial, sans-serif;
+                            border-collapse: collapse;
+                            width: 100%;
+                          }
+                          td, th {
+                            border: 1px solid #dddddd;
+                            text-align: left;
+                            padding: 8px;
+                          }
+                          tr:nth-child(even) {
+                            background-color: #dddddd;
+                          }
+                          .date-table-container {
+                            width: 100%;
+                            overflow-x: auto;
+                          }
+                          .date-table {
+                            display: flex;
+                            border: 1px solid #dddddd;
+                            padding: 5px;
+                            justify-content: space-between;
+                          }
+                          .date-item {
+                            cursor: pointer;
+                            flex: 1;
+                            text-align: center;
+                          }
+                          .selected {
+                            background-color: lightblue;
+                          }
+                        `;
+
+            // Append style tag to the document head
+            document.head.appendChild(styleTag);
+            var studentDiv = document.querySelector("div.divstudent");
+            let departureDiv = document.querySelector(".date-table-container");
+
+            // Check if departureDiv already exists
+            if (!departureDiv) {
+              departureDiv = document.createElement("div");
+              departureDiv.classList.add("date-table-container");
+
+              // Set inner HTML only if departureDiv is newly created
+              departureDiv.innerHTML = `
+                    <div class="date-table-container" id="dateTableContainer">
+                    <div id='dataHeader'style="text-align: center;">
+                    <h1 style="text-align: center;">${from} to ${to}</h1>
+                    </div>
+                        <div class="date-table" id="dateTable">
+                            <!-- Date items will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <table id="content-table">
+                        <tr>
+                            <th>Train service</th>
+                            <th>Departure</th>
+                            <th>Arrival</th>
+                            <th>Duration</th>
+                            <th>Available seats</th>
+                            <th>Min. fare</th>
+                        </tr>
+                    </table>
+                `;
+              studentDiv.insertAdjacentHTML("afterend", departureDiv.outerHTML);
+            } else {
+              // Check if 'from' or 'to' values have changed
+              const previousFrom = departureDiv.querySelector('h1').innerText.split(' to ')[0];
+              const previousTo = departureDiv.querySelector('h1').innerText.split(' to ')[1];
+              if (previousFrom !== from || previousTo !== to) {
+                departureDiv.querySelector('h1').innerText = `${from} to ${to}`;
+              }
+            }
+            let startIndex = 0;
+            let endIndex = 3; // Show 4 date items initially
+            let currentBaseDate = departure;
+            function getDatesRow(chosenDate) {
+              const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+              let dataItems = [];
+              for (let i = -3; i <= 3; i++) {
+                const date = new Date(chosenDate);
+                date.setDate(chosenDate.getDate() + i);
+                const formattedDate = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                dataItems.push(formattedDate);
+              }
+              return dataItems;
+            }
+            function renderDateItems(baseDate) {
+              var dateTable = document.getElementById("dateTable");
+              dateTable.innerHTML = ""; // Clear previous date items
+
+              let dateItems = getDatesRow(baseDate);
+              const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+              const formattedDepartureDate = `${months[departure.getMonth()]} ${departure.getDate()}, ${departure.getFullYear()}`;
+              for (let i = 0; i < dateItems.length; i++) {
+                let dateItem = document.createElement("div");
+                dateItem.className = "date-item";
+                dateItem.textContent = dateItems[i];
+                dateTable.appendChild(dateItem);
+
+                // Highlight the initially selected departure date only once
+                if (dateItems[i] === formattedDepartureDate) {
+                  changeTableContent(dateItem.textContent);
+                  dateItem.classList.add("selected");
+                }
+                // Add event listener to toggle highlighting and call changeTableContent
+                dateItem.addEventListener("click", function () {
+                  // Remove highlighting from previously selected date items
+                  let selectedDateItems = document.querySelectorAll(".date-item.selected");
+                  selectedDateItems.forEach(function (item) {
+                    item.classList.remove("selected");
+                  });
+
+                  // Add highlighting to the clicked date item
+                  this.classList.add("selected");
+
+                  // Call changeTableContent with the selected date
+                  changeTableContent(this.textContent);
+                });
+
+                // Add navigation to previous/next dates
+                if (i === 0) {
+                  dateItem.classList.add("nav-button");
+                  dateItem.addEventListener("click", loadPreviousDates);
+                } else if (i === dateItems.length - 1) {
+                  dateItem.classList.add("nav-button");
+                  dateItem.addEventListener("click", loadNextDates);
+                }
+              }
+            }
+            function loadPreviousDates() {
+              currentBaseDate.setDate(currentBaseDate.getDate() - 4);
+              renderDateItems(currentBaseDate);
+            }
+            function loadNextDates() {
+              currentBaseDate.setDate(currentBaseDate.getDate() + 4);
+              renderDateItems(currentBaseDate);
+            }
+            renderDateItems(currentBaseDate);
+          };
+}.bind(items[i]))();
+          }</script>
+                        </body>
+                    </html>
+                

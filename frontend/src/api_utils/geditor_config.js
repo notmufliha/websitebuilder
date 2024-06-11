@@ -17,32 +17,33 @@ import {
   styleManager,
   styles,
   toggleSidebar,
-  traitManager
-} from './geditor_utils'
-import tailwindComponent from '../plugins/tailwind'
-import swiperComponent from '../plugins/swiper'
-import gjsnavbar from '../plugins/navbar'
-import chartLibComponent from '../plugins/charts'
-import swiperComponent2 from '../plugins/template'
-import customCodePlugin from 'grapesjs-custom-code'
-import sliderComponent from '../plugins/slider'
+  traitManager,
+} from "./geditor_utils";
+import tailwindComponent from "../plugins/tailwind";
+import swiperComponent from "../plugins/swiper";
+import gjsnavbar from "../plugins/navbar";
+import chartLibComponent from "../plugins/charts";
+import swiperComponent2 from "../plugins/template";
+import customCodePlugin from 'grapesjs-custom-code';
+import tabs from 'grapesjs-tabs'
+import sliderComponent from "../plugins/slider";
 import grapesjsloginform from '../plugins/login'
 import grapesjsbookingform from '../plugins/booking'
 
-function loadLastIdCounters () {
+function loadLastIdCounters() {
   const storedCounters = localStorage.getItem('idCounters')
   return storedCounters
     ? JSON.parse(storedCounters)
     : { text: 100, image: 100, video: 100 }
 }
 
-function saveIdCounters (counters) {
+function saveIdCounters(counters) {
   localStorage.setItem('idCounters', JSON.stringify(counters))
 }
 
 let idCounters = loadLastIdCounters()
 
-function generateCustomId (type) {
+function generateCustomId(type) {
   console.log(type)
   let prefix = 'component_' // Default prefix
   switch (type.toLowerCase()) {
@@ -109,7 +110,6 @@ const geditorConfig = (pageId, assets) => {
   const panelTopBar = $('#main-content > .navbar-light')
 
   const editor = grapesjs.init({
-    allowScripts: 1,
     container: '#editor',
     blockManager: {
       appendTo: '#blocks'
@@ -193,7 +193,8 @@ const geditorConfig = (pageId, assets) => {
       swiperComponent2,
       sliderComponent,
       customCodePlugin,
-      grapesjsloginform
+      grapesjsloginform,
+      tabs
     ],
     pluginsOpts: {
       grapesjsbookingform: {},
@@ -208,7 +209,8 @@ const geditorConfig = (pageId, assets) => {
       swiperComponent2: {},
       sliderComponent: {},
       [customCodePlugin]: {},
-      grapesjsloginform: {}
+      grapesjsloginform: {},
+      tabs: {}
     },
     allowScripts: true
   })
@@ -336,7 +338,7 @@ const geditorConfig = (pageId, assets) => {
 
   // Add the export command to include saving files to static folder
   editor.Commands.add('export-template', {
-    run (editor, sender) {
+    run(editor, sender) {
       console.log('Export-template command triggered')
       sender && sender.set('active') // turn off the button
       const htmlContent =
